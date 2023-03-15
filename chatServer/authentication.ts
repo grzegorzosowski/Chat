@@ -31,7 +31,7 @@ export function initAuthentication(app: Application) {
     console.log("DeserializeUser, baseUSer: ", baseUser);
     try {
       const user = await User.findOne({ email: baseUser.email });
-      done(undefined, user?.nick);
+      done(undefined, user);
     } catch(err) {done(err,undefined)}
     
   });

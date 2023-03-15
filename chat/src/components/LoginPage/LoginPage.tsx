@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Box from '@mui/material/Box';
-//import { useSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 import { TextField } from '@mui/material';
 import InputPassword from '../InputPassword/InputPassword';
 import Button from '@mui/material/Button'
@@ -10,12 +10,9 @@ interface FormState {
   userPassword: string;
 }
 
-
-
-
 export default function LoginPage() {
   const [form, setForm] = useState<FormState>({ userEmail: '', userPassword: '' });
-  //const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const requestOptions = {
     method: 'POST',
     headers: {
@@ -34,8 +31,7 @@ export default function LoginPage() {
         await fetch('api/user', { method: 'GET' });
         window.location.replace('/chat');
       } else {
-        //enqueueSnackbar('Wrong password', { variant: 'error' });
-
+        enqueueSnackbar('Wrong password', { variant: 'error' });
       }
     } catch (error) {
       console.log('Some error during logging');

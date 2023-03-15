@@ -4,13 +4,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import path from "path";
-import { port } from "./config";
 import apiRouter from "./routes/api";
 import { initAuthentication } from "./authentication";
 import "./db/mongoose";
 import session from "express-session";
+import webSocketController from './controllers/webSocketController'
 
-const secret = process.env.SECRET || "default-secret-key"
+const secret = process.env.SECRET || "default-secret-key";
 
 const oneDay = 1000 * 60 * 60 * 24;
 
@@ -34,6 +34,5 @@ app.use(bodyParser.json());
 app.use(cors());
 initAuthentication(app);
 app.use("/", apiRouter);
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}.`);
-});
+
+webSocketController(app);

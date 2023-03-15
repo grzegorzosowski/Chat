@@ -12,17 +12,18 @@ interface UserProviderType {
 }
 
 export function UserProvider({ children }: UserProviderType) {
-    const [user, setUser] = useState<Record<string, any> | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<Record<string, any> | undefined>();
     
 
     useEffect(() => {
         setIsLoading(true);
         fetch('api/user', {method: 'GET'})
-            .then((user: Record<string, any>) => {
+            .then((res) => res.json() as Promise<Record<string, any>>)
+            .then((user) => {
                 console.log("USE EFFECT SIĘ WYKONAŁ")
                 setUser(user);
-                console.log("🚀 ~ file: UserProvider.tsx:27 ~ .then ~ user:", user)
+                console.log("🚀 User po przetworzeniu", user)
             })
                 
             .catch((err) => {

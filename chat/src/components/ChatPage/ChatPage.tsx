@@ -1,4 +1,3 @@
-import React from 'react'
 import UserList from '../../components/UserList/UserList'
 import ChatWindow from '../../components/ChatWindow/ChatWindow'
 import ChatOption from '../../components/ChatOption/ChatOption'
