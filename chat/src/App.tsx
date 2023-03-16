@@ -6,7 +6,9 @@ import { useUser } from './UserProvider';
 import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { SnackbarProvider } from 'notistack';
 import { Button } from '@mui/material';
-
+import { Provider } from 'react-redux';
+import { store } from './store';
+import React from 'react'
 export default function App() {
   const user = useUser();
   const isUser = !!user;
@@ -28,25 +30,26 @@ export default function App() {
     window.location.replace('/');
   }
 
-
   return (
-    <main className={styles.main}>
-      <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
-        <Routes>
-          <Route path='/' element={
-            <ProtectedRoute isUser={!isUser} redirectPath={'/chat'} >
-              <LoginPage />
-            </ProtectedRoute>}
-          />
-          <Route path='/chat' element={
-            <ProtectedRoute isUser={isUser}>
-              <ChatPage />
-            </ProtectedRoute>
-          } />
-        </Routes>
-      </SnackbarProvider>
-      <Button onClick={handleClick}>Logout</Button>
-    </main>
+    <Provider store={store}>
+      <main className={styles.main}>
+        <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+          <Routes>
+            <Route path='/' element={
+              <ProtectedRoute isUser={!isUser} redirectPath={'/chat'} >
+                <LoginPage />
+              </ProtectedRoute>}
+            />
+            <Route path='/chat' element={
+              <ProtectedRoute isUser={isUser}>
+                <ChatPage />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </SnackbarProvider>
+        <Button onClick={handleClick}>Logout</Button>
+      </main>
+    </Provider>
   );
 }
 

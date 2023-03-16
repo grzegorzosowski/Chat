@@ -1,0 +1,24 @@
+.main {
+    background-color: aliceblue;
+    opacity: 0.8;
+    color: black;
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-flow: column nowrap;
+    overflow-y: auto;
+    max-height: 100%;
+}
+.main  > :first-child {
+    margin-top: auto !important;
+}
+.messageBox {
+    background-color: #BBD6B8;
+    padding: 4px 10px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    width: fit-content;
+}

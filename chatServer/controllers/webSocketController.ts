@@ -11,7 +11,7 @@ export default function initWebSocket(app: Application) {
     console.log("Client connected");
     socket.on("message", (message: string) => {
       console.log(`This is client message: ${message}`);
-      socket.send(`You sent message: ${message}`, (err) => {
+      socket.send(`${message}`, (err) => {
         if(err) {console.log(err)}
       });
     });
