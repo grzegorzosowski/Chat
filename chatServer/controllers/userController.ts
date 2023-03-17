@@ -1,14 +1,15 @@
 import User, { UserType } from '../db/models/User'
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
+import { json } from 'body-parser';
 
 const saltRounds = 12;
 
 class UserController {
     async createUser (req: Request, res: Response) {
-        const userName = req.body.nick;
-        const userEmail = req.body.uEmail;
-        const userPassword = req.body.uPassword;
+        const userName = 'zxc';
+        const userEmail = 'zxc@zxc.zxc';
+        const userPassword = 'zxc';
         console.log("Creating user...")
 
         try {
@@ -30,6 +31,12 @@ class UserController {
             return res.status(422).json({ message: err.message });
         }
         return res.status(201).json('User created successfully');
+    }
+
+    async getUsers (req: Request, res: Response) {
+        const users = await User.find({nick: {$ne: req.body.nick}});
+        console.log('Dane wysłane: ',users)
+        res.json(users);
     }
 }
 

@@ -9,7 +9,6 @@ export default function MessageBox(): JSX.Element {
     const user = useUser();
     const [message, setMessage] = useState<string>('');
     const dispatch = useAppDispatch();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
     const messages = useAppSelector((state) => state.messages.messages)
     useEffect(() => {
         const ws = webSocket
@@ -24,9 +23,7 @@ export default function MessageBox(): JSX.Element {
         }
     }, []);
     useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (messages.length > 1) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           const lastMessage = messages[messages.length - 1];
           sendMessage(JSON.stringify(lastMessage));
         }
@@ -37,10 +34,10 @@ export default function MessageBox(): JSX.Element {
             event.preventDefault();
             if (message.length > 0) {
                 dispatch(addMessage({
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                    ID: messages.length,
+                    messageID: messages.length.toString(),
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     senderID: user?._id,
+                    chatID: {id: 1},
                     message: message,
                     timestamp: new Date(),
                 }))

@@ -13,7 +13,7 @@ router.get('/api/user', loggedIn, function (req, res, next) {
     console.log('User wysłany z api/user ', req.user)
     res.send(req.user);
 });
-
+router.post('/api/getUsers', UserController.getUsers);
 router.post(
     '/api/login/password',
     passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export type ChatType = {
-    chatName: String;
+    chatName: string | undefined;
     members: Array<String> | undefined;
 }
 
