@@ -1,5 +1,6 @@
 .shape {
-    background-color: rgb(146, 172, 172);
+    background-color: #63a76d;
+    opacity: 0.8;
     height: 100%;
     border-radius: 10px;
     padding: 5px;

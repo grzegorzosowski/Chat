@@ -3,7 +3,8 @@ import mongoose from 'mongoose';
 export type MessagesType = {
     chatID: Object;
     senderID: Object;
-    message: String;
+    messageID: number;
+    message: string;
     timestamp: Date;
 }
 
@@ -14,6 +15,10 @@ const MessagesSchema = new mongoose.Schema<MessagesType>({
     },
     senderID: {
         type: Object,
+        required: true,
+    },
+    messageID: {
+        type: Number,
         required: true,
     },
     message: {

@@ -11,3 +11,17 @@
     margin-bottom: 5px;
     box-sizing: border-box;
 }
+.shapeActive {
+    border-radius: 10px;
+    display: flex;
+    padding-left: 10px;
+    padding-bottom: 5px;
+    align-items: center;
+    font-size: 15px;
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    background-color: #defdcf;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.9);
+}

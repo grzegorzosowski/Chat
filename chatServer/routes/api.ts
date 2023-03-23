@@ -1,5 +1,6 @@
 import { Router } from "express";
 import UserController from '../controllers/userController'
+import ChatController from '../controllers/chatController'
 const router = Router();
 import passport = require("passport");
 
@@ -10,10 +11,10 @@ router.get("/", (req, res) => {
 
 router.get('/api/createUser', UserController.createUser);
 router.get('/api/user', loggedIn, function (req, res, next) {
-    console.log('User wysłany z api/user ', req.user)
     res.send(req.user);
 });
 router.post('/api/getUsers', UserController.getUsers);
+router.post('/api/findChat', ChatController.findChat);
 router.post(
     '/api/login/password',
     passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
@@ -31,7 +32,6 @@ router.post('/api/logout', (req, res, next) => {
 });
 
 function loggedIn(req: any, res: any, next: any) {
-    console.log("LoggedIn", req.user)
     if (req.user) {
         next();
     } else {

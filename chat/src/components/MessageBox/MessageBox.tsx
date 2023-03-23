@@ -5,13 +5,17 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 import { addMessage } from '../../features/messages/messagesSlice';
 import { useUser } from '../../UserProvider';
 
+
+
 export default function MessageBox(): JSX.Element {
     const user = useUser();
-    const [message, setMessage] = useState<string>('');
+    const [messageText, setMessageText] = useState<string>('');
     const dispatch = useAppDispatch();
     const messages = useAppSelector((state) => state.messages.messages)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+    const activeChat = useAppSelector((state) => state.activeChat.activeChat)
     useEffect(() => {
-        const ws = webSocket
+        const ws = webSocket;
         if (ws) {
             const open = () => {
                 console.log('WebSocket connected');
@@ -22,32 +26,28 @@ export default function MessageBox(): JSX.Element {
             };
         }
     }, []);
-    useEffect(() => {
-        if (messages.length > 1) {
-          const lastMessage = messages[messages.length - 1];
-          sendMessage(JSON.stringify(lastMessage));
-        }
-      }, [messages]);
+
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            if (message.length > 0) {
-                dispatch(addMessage({
-                    messageID: messages.length.toString(),
+            if (messageText.length > 0) {
+                const newMessage = {
+                    messageID: messages[messages.length - 1].messageID + 1,
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     senderID: user?._id,
-                    chatID: {id: 1},
-                    message: message,
+                    chatID: activeChat.chatID,
+                    message: messageText,
                     timestamp: new Date(),
-                }))
-               
-                setMessage('')
+                }
+                dispatch(addMessage(newMessage))
+                console.log('New Message: ', newMessage);
+                sendMessage(JSON.stringify(newMessage));
+                setMessageText('')
             }
         }
     }
-
-    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(event.target.value)
+    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setMessageText(event.target.value)
     const sendMessage = (messages: string) => {
         if (webSocket) {
             webSocket.send(messages);
@@ -57,7 +57,7 @@ export default function MessageBox(): JSX.Element {
     return (
         <textarea
             className={styles.messageInput}
-            value={message}
+            value={messageText}
             onChange={onChange}
             onKeyDown={handleKeyPress}
         ></textarea>

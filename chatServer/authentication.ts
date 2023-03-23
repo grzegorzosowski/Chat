@@ -13,22 +13,16 @@ export function initAuthentication(app: Application) {
 
   passport.serializeUser((user, done) => {
     const theUser = user as UserType;
-    console.log(
-      "🚀 ~ file: authentication.ts:16 ~ passport.serializeUser ~ theUser:",
-      theUser
-    );
     const serializedUser = {
       nick: theUser.nick,
       email: theUser.email,
     };
     process.nextTick(() => {
-      console.log("User serialized", serializedUser);
       return done(null, serializedUser);
     });
   });
 
   passport.deserializeUser(async (baseUser: UserType, done) => {
-    console.log("DeserializeUser, baseUSer: ", baseUser);
     try {
       const user = await User.findOne({ email: baseUser.email });
       done(undefined, user);

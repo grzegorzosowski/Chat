@@ -35,7 +35,6 @@ class UserController {
 
     async getUsers (req: Request, res: Response) {
         const users = await User.find({nick: {$ne: req.body.nick}});
-        console.log('Dane wysłane: ',users)
         res.json(users);
     }
 }

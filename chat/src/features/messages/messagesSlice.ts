@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Message {
-    messageID: string;
+    messageID: number;
     senderID: object;
-    chatID: object;
+    chatID: string;
     message: string;
     timestamp: Date;
 }
@@ -13,13 +13,15 @@ interface MessagesState {
 }
 
 const initialState: MessagesState = {
-    messages: [{
-        messageID: '',
-        senderID: {},
-        chatID: {id: 0},
-        message: "",
-        timestamp: new Date(),
-    }],
+    messages: [
+        {
+            messageID: 1,
+            senderID: {},
+            chatID: '1',
+            message: '',
+            timestamp: new Date(),
+        },
+    ],
 };
 
 export const messagesSlice = createSlice({
@@ -32,6 +34,6 @@ export const messagesSlice = createSlice({
     },
 });
 
-export const {addMessage} = messagesSlice.actions;
+export const { addMessage } = messagesSlice.actions;
 
 export default messagesSlice.reducer;
