@@ -25,10 +25,18 @@ export const apiSlice = createApi({
                 body: chat,
             }),
         }),
+        getMessages: builder.mutation({
+            query: (chatID) => ({
+                url: `api/getMessages`,
+                method: 'POST',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                body: chatID,
+            }),
+        }),
     }),
 })
 
-export const { useFindChatMutation } = apiSlice
+export const { useFindChatMutation, useGetMessagesMutation } = apiSlice
 
 type FindChatResult = ReturnType<typeof useFindChatMutation>;
 type FindChatData = FindChatResult extends Promise<PayloadAction<FindChatResponse>> ? ChatData : unknown;

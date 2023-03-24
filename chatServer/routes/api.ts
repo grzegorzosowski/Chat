@@ -15,6 +15,7 @@ router.get('/api/user', loggedIn, function (req, res, next) {
 });
 router.post('/api/getUsers', UserController.getUsers);
 router.post('/api/findChat', ChatController.findChat);
+router.post('/api/getMessages', ChatController.getMessages);
 router.post(
     '/api/login/password',
     passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),

@@ -18,9 +18,10 @@ interface MessageData {
 export default function ChatWindow(): JSX.Element {
   const user = useUser();
   const message = useAppSelector((state) => state.messages.messages)
+  const activeChat = useAppSelector((state) => state.activeChat.activeChat);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    console.log(message);
+    console.log('Messages from store: ',message);
     const ws = webSocket;
     if (ws) {
       const open = () => {
@@ -48,11 +49,14 @@ export default function ChatWindow(): JSX.Element {
     }
   }, [dispatch, message]);
 
+
   return (
     <Box className={styles.main}>
-      <Box>{user?.nick}</Box>
-      {message.slice(1).map(mess => <Tooltip title={mess.timestamp.toDateString()}>
-        <Box className={styles.messageBox}>{mess.message}</Box>
+      {activeChat.chatID !== '1' && message.map(mess => <Tooltip key={mess.messageID} title={mess.timestamp.toString()}>
+        {mess.senderID === user?._id ?
+          <Box className={styles.myMessage}>{mess.message}</Box> :
+          <Box className={styles.othersMessage}>{mess.message}</Box>
+        }
       </Tooltip>)}
     </Box>
   )

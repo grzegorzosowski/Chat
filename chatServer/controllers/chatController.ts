@@ -20,6 +20,12 @@ class ChatController {
             res.json(chat);
         }
     }
+
+    async getMessages(req: Request, res: Response) {
+        const messages = await Messages.find({ chatID: req.body.chatID });
+        console.log('Messages: ', messages);
+        res.json(messages);
+    }
 }
 
 export default new ChatController();

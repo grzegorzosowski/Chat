@@ -6,7 +6,8 @@ import styles from '../../styles/UserList.module.css'
 import Link from '@mui/material/Link';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { setActiveChat } from '../../features/chats/chatsSlice';
-import { useFindChatMutation } from '../../features/api/apiSlice';
+import { useFindChatMutation, useGetMessagesMutation } from '../../features/api/apiSlice';
+import { putMessages } from '../../features/messages/messagesSlice';
 interface User {
   _id: string;
   nick: string;
@@ -18,6 +19,8 @@ export default function UserList(): JSX.Element {
   const [users, setUsers] = useState([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
   const [findChat] = useFindChatMutation();
+  const [getMessages] = useGetMessagesMutation();
+  const messages = useAppSelector((state) => state.messages.messages);
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -38,25 +41,35 @@ export default function UserList(): JSX.Element {
     }
   }, []);
 
-  const handleClick = (userLink: User ) => {
+  const handleClick = (userLink: User) => {
     console.log('Kliknięto na: ', userLink._id);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     findChat({ nick: user?.nick, nick2: userLink.nick })
-    .unwrap()
-    .then((result) => {
-      const newChat = {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        chatID: result?._id,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        members: result?.members,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        chatName: result?.chatName,
-      };
-      dispatch(setActiveChat(newChat));
-    })
-    .catch((error) => console.log(error));
+      .unwrap()
+      .then((result) => {
+        const newChat = {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          chatID: result?._id,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          members: result?.members,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          chatName: result?.chatName,
+        };
+        dispatch(setActiveChat(newChat));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        getMessages({ chatID: newChat.chatID })
+          .unwrap()
+          .then((result) => {
+            console.log('Wiadomości: ', result)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            dispatch(putMessages(result));
+          })
+          .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
+
   }
-  
+
 
   return (
     <Box className={styles.shape}>

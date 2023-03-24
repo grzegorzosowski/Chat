@@ -15,10 +15,20 @@
 .main  > :first-child {
     margin-top: auto !important;
 }
-.messageBox {
+.myMessage {
     background-color: #BBD6B8;
     padding: 4px 10px;
     margin-bottom: 5px;
     border-radius: 10px;
     width: fit-content;
+    align-self: flex-end;
+}
+
+.othersMessage {
+    background-color: #f8c4c4;
+    padding: 4px 10px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    width: fit-content;
+    align-self: flex-start;
 }

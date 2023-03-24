@@ -32,8 +32,9 @@ export default function MessageBox(): JSX.Element {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             if (messageText.length > 0) {
+                console.log('Message: ', messages);
                 const newMessage = {
-                    messageID: messages[messages.length - 1].messageID + 1,
+                    messageID: (messages[messages?.length - 1]?.messageID + 1) || 1,
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     senderID: user?._id,
                     chatID: activeChat.chatID,
@@ -47,7 +48,7 @@ export default function MessageBox(): JSX.Element {
             }
         }
     }
-    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setMessageText(event.target.value)
+    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {if(activeChat.chatID !== '1'){setMessageText(event.target.value)}}
     const sendMessage = (messages: string) => {
         if (webSocket) {
             webSocket.send(messages);
