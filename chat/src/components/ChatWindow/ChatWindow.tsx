@@ -56,7 +56,7 @@ export default function ChatWindow(): JSX.Element {
 
 
   return (
-    <><Box>{user?._id} {user?.nick}</Box>
+    <>
     <Box className={styles.main}>
       {activeChat.chatID !== '1' && message.map(mess => <Tooltip key={mess.messageID} title={mess.timestamp.toString()}>
         {mess.senderID === user?._id ?

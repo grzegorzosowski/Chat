@@ -6,6 +6,10 @@ export type UserType = {
     password: string;
 }
 
+export type UserWithId = {
+    _id: mongoose.ObjectId
+} & UserType
+
 const UserSchema = new mongoose.Schema<UserType>({
     nick: {
         type: String,
