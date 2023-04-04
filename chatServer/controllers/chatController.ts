@@ -5,12 +5,12 @@ import Messages, { MessagesType } from '../db/models/Messages';
 class ChatController {
     async findChat(req: Request, res: Response) {
         const chat = await Chat.findOne({
-            members: { $all: [req.body.nick, req.body.nick2] },
+            members: { $all: [req.body.id1, req.body.id2] },
         });
         if (!chat) {
             const newChat = new Chat<ChatType>({
-                chatName: req.body.nick + ', ' + req.body.nick2,
-                members: [req.body.nick, req.body.nick2],
+                chatName: req.body.nick1 + ', ' + req.body.nick2,
+                members: [req.body.id1, req.body.id2],
             });
             await newChat.save().then(() => {
                 console.log('Chat has been created');
@@ -23,7 +23,6 @@ class ChatController {
 
     async getMessages(req: Request, res: Response) {
         const messages = await Messages.find({ chatID: req.body.chatID });
-        console.log('Messages: ', messages);
         res.json(messages);
     }
 }

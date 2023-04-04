@@ -9,6 +9,7 @@ import { initAuthentication } from "./authentication";
 import "./db/mongoose";
 import session from "express-session";
 import webSocketController from './controllers/webSocketController'
+import { sessionMiddlewear } from "./sessionMiddlewear";
 
 const secret = process.env.SECRET || "default-secret-key";
 
@@ -18,15 +19,8 @@ const app = express();
 const staticPath = path.join(__dirname, "public");
 
 app.use(express.static(staticPath));
-app.use(cookieParser());
-app.use(
-  session({
-    secret: secret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: oneDay, secure: false },
-  })
-);
+app.use(cookieParser(secret));
+app.use(sessionMiddlewear);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

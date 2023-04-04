@@ -5,7 +5,7 @@ interface Message {
     senderID: object;
     chatID: string;
     message: string;
-    timestamp: Date;
+    timestamp: string;
 }
 
 interface MessagesState {
@@ -19,7 +19,7 @@ const initialState: MessagesState = {
             senderID: {},
             chatID: '1',
             message: '',
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
         },
     ],
 };

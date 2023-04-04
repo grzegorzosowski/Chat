@@ -4,7 +4,7 @@ import { useUser } from '../../UserProvider';
 import User from '../User/User'
 import styles from '../../styles/UserList.module.css'
 import Link from '@mui/material/Link';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useAppDispatch } from '../../hooks';
 import { setActiveChat } from '../../features/chats/chatsSlice';
 import { useFindChatMutation, useGetMessagesMutation } from '../../features/api/apiSlice';
 import { putMessages } from '../../features/messages/messagesSlice';
@@ -20,7 +20,6 @@ export default function UserList(): JSX.Element {
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
-  const messages = useAppSelector((state) => state.messages.messages);
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -44,7 +43,7 @@ export default function UserList(): JSX.Element {
   const handleClick = (userLink: User) => {
     console.log('Kliknięto na: ', userLink._id);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    findChat({ nick: user?.nick, nick2: userLink.nick })
+    findChat({ id1: user?._id, id2: userLink._id, nick1: user?.nick, nick2: userLink.nick })
       .unwrap()
       .then((result) => {
         const newChat = {
@@ -60,7 +59,6 @@ export default function UserList(): JSX.Element {
         getMessages({ chatID: newChat.chatID })
           .unwrap()
           .then((result) => {
-            console.log('Wiadomości: ', result)
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             dispatch(putMessages(result));
           })
@@ -73,8 +71,8 @@ export default function UserList(): JSX.Element {
 
   return (
     <Box className={styles.shape}>
-      {users && users.map((user) => <Link onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
-        <User key={user} user={user}></User>
+      {users && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
+        <User key={user.nick} user={user}></User>
       </Link>)}
     </Box>
   )

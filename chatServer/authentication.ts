@@ -5,6 +5,12 @@ import { Application } from "express";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 
+interface SerializedUser {
+  _id: string;
+  nick: string;
+  email: string;
+}
+
 export function initAuthentication(app: Application) {
   app.use(passport.initialize());
   app.use(passport.session());
@@ -12,8 +18,9 @@ export function initAuthentication(app: Application) {
   passport.use(new LocalStrategy(verify));
 
   passport.serializeUser((user, done) => {
-    const theUser = user as UserType;
+    const theUser = user as SerializedUser;
     const serializedUser = {
+      _id: theUser._id,
       nick: theUser.nick,
       email: theUser.email,
     };

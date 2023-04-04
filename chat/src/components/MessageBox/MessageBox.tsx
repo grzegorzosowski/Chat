@@ -15,15 +15,19 @@ export default function MessageBox(): JSX.Element {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     const activeChat = useAppSelector((state) => state.activeChat.activeChat)
     useEffect(() => {
-        const ws = webSocket;
-        if (ws) {
-            const open = () => {
-                console.log('WebSocket connected');
+        if (user) {
+            const ws = webSocket;
+            console.log('WebSocket: ', ws);
+            if (ws) {
+                console.log('Inside if of websocket in message box');
+                const open = () => {
+                    console.log('WebSocket connected');
+                }
+                ws.addEventListener('open', open);
+                return () => {
+                    ws.removeEventListener('open', open);
+                };
             }
-            ws.addEventListener('open', open);
-            return () => {
-                ws.removeEventListener('open', open);
-            };
         }
     }, []);
 
@@ -39,7 +43,7 @@ export default function MessageBox(): JSX.Element {
                     senderID: user?._id,
                     chatID: activeChat.chatID,
                     message: messageText,
-                    timestamp: new Date(),
+                    timestamp: new Date().toISOString(),
                 }
                 dispatch(addMessage(newMessage))
                 console.log('New Message: ', newMessage);
@@ -48,7 +52,7 @@ export default function MessageBox(): JSX.Element {
             }
         }
     }
-    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {if(activeChat.chatID !== '1'){setMessageText(event.target.value)}}
+    const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => { if (activeChat.chatID !== '1') { setMessageText(event.target.value) } }
     const sendMessage = (messages: string) => {
         if (webSocket) {
             webSocket.send(messages);

@@ -1,5 +1,5 @@
 import { Box, Tooltip } from '@mui/material';
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { webSocket } from '../../webSocketConfig'
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import styles from '../../styles/ChatWindow.module.css'
@@ -8,7 +8,7 @@ import { addMessage } from '../../features/messages/messagesSlice';
 
 interface MessageData {
   messageID: number;
-  senderID: string;
+  senderID: object;
   chatID: string;
   message: string;
   timestamp: string;
@@ -21,9 +21,9 @@ export default function ChatWindow(): JSX.Element {
   const activeChat = useAppSelector((state) => state.activeChat.activeChat);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    console.log('Messages from store: ',message);
+    console.log('Messages from store: ', message);
     const ws = webSocket;
-    if (ws) {
+    
       const open = () => {
         console.log('WebSocket connected');
       }
@@ -31,26 +31,32 @@ export default function ChatWindow(): JSX.Element {
 
       const onMessage = (event: MessageEvent<string>) => {
         const data = JSON.parse(event.data, undefined) as MessageData;
-          console.log('message : ', data);
+        console.log('message : ', data);
+        
+        console.log('senderID: ', message[message?.length - 1]?.senderID);
+        console.log('userID: ', user?._id);
+        if (data.chatID === activeChat.chatID) {
           dispatch(addMessage({
             messageID: data.messageID,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            senderID: user?._id,
+            senderID: data.senderID,
             chatID: data.chatID,
             message: data?.message,
-            timestamp: new Date(data?.timestamp),
+            timestamp: new Date(data?.timestamp).toISOString(),
           }))
+        }
       }
+
       ws.addEventListener('message', onMessage);
       return () => {
         ws.removeEventListener('open', open);
         ws.removeEventListener('message', onMessage)
       };
-    }
+    
   }, [dispatch, message]);
 
 
   return (
+    <><Box>{user?._id} {user?.nick}</Box>
     <Box className={styles.main}>
       {activeChat.chatID !== '1' && message.map(mess => <Tooltip key={mess.messageID} title={mess.timestamp.toString()}>
         {mess.senderID === user?._id ?
@@ -59,6 +65,7 @@ export default function ChatWindow(): JSX.Element {
         }
       </Tooltip>)}
     </Box>
+    </>
   )
 }
 

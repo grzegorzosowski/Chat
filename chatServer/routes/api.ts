@@ -1,17 +1,24 @@
-import { Router } from "express";
-import UserController from '../controllers/userController'
-import ChatController from '../controllers/chatController'
+import { Router } from 'express';
+import UserController from '../controllers/userController';
+import ChatController from '../controllers/chatController';
+import { UserType } from '../db/models/User';
 const router = Router();
-import passport = require("passport");
+import passport = require('passport');
 
-router.get("/", (req, res) => {
-  res.send("Hello, World!");
-  console.log("JEst komunikacja");
+
+router.get('/', (req, res) => {
+    res.send('Hello, World!');
+    console.log('JEst komunikacja');
 });
 
 router.get('/api/createUser', UserController.createUser);
-router.get('/api/user', loggedIn, function (req, res, next) {
-    res.send(req.user);
+router.get('/api/user', loggedIn, function (req: any, res, next) {
+    const userToSend = {
+        _id: req.user?._id,
+        nick: req.user?.nick,
+        email: req.user?.email,
+    };
+    res.send(userToSend);
 });
 router.post('/api/getUsers', UserController.getUsers);
 router.post('/api/findChat', ChatController.findChat);
@@ -19,7 +26,7 @@ router.post('/api/getMessages', ChatController.getMessages);
 router.post(
     '/api/login/password',
     passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
-     (req, res) => {
+    (req, res) => {
         res.sendStatus(200);
     }
 );

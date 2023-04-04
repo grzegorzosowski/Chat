@@ -21,9 +21,7 @@ export function UserProvider({ children }: UserProviderType) {
         fetch('api/user', {method: 'GET'})
             .then((res) => res.json() as Promise<Record<string, any>>)
             .then((user) => {
-                console.log("USE EFFECT SIĘ WYKONAŁ")
                 setUser(user);
-                console.log("🚀 User po przetworzeniu", user)
             })
                 
             .catch((err) => {

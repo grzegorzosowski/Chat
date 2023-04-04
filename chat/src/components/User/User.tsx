@@ -12,12 +12,10 @@ interface UserProps {
 export default function User(user: UserProps): JSX.Element {
     const activeChat = useAppSelector((state) => state.activeChat)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    console.log('Dane z usera: ', user?.user)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const id = user.user._id;
     const nick = user.user.nick;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    console.log('Aktywny chat: ', activeChat)
-    const active = activeChat.activeChat.members.includes(nick);
+    const active = activeChat.activeChat.members.includes(id);
 
     return (
         <>{!active ? (
