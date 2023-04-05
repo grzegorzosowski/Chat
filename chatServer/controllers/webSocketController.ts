@@ -5,7 +5,7 @@ import Chat from '../db/models/Chat';
 import mongoose from 'mongoose';
 import Messages, { MessagesType } from '../db/models/Messages';
 import { sessionMiddlewear } from '../sessionMiddlewear';
-import {UserWithId} from '../db/models/User'
+import { UserWithId } from '../db/models/User';
 
 interface ConnectedClient {
     socket: WebSocket;
@@ -13,20 +13,19 @@ interface ConnectedClient {
 }
 
 function getUserFromReq(req: any) {
-    return req.session?.passport?.user
+    return req.session?.passport?.user;
 }
-
 
 type ConnectedClients = {
-    [key: string]: Array<WebSocket>
-}
+    [key: string]: Array<WebSocket>;
+};
 
 function pushConnection(obj: ConnectedClients, userId: mongoose.ObjectId, socket: WebSocket) {
-    const userIdStr = String(userId)
-    if(!(userIdStr in obj)) {
-        obj[userIdStr] = [socket]
-    }else {
-        obj[userIdStr].push(socket)
+    const userIdStr = String(userId);
+    if (!(userIdStr in obj)) {
+        obj[userIdStr] = [socket];
+    } else {
+        obj[userIdStr].push(socket);
     }
 }
 
@@ -34,38 +33,36 @@ export default function initWebSocket(app: Application) {
     const server = app.listen(port, () => {
         console.log(`Server is listening on port ${port}.`);
     });
-    const connectedClients: ConnectedClients = {}
+    const connectedClients: ConnectedClients = {};
     const wss = new (require('ws').Server)({
         server,
         verifyClient: async (info: any, done: any) => {
             sessionMiddlewear(info.req, {} as any, () => {
                 info.session = info.req.session;
                 done(info.req.session);
-              });
+            });
         },
     });
-    
+
     wss.on('connection', (socket: WebSocket.WebSocket, req: any) => {
         const user = getUserFromReq(req);
-        if(!user) {
+        if (!user) {
             return;
         }
-        console.log("user._id", user._id)
-        pushConnection(connectedClients, user._id, socket)
+        console.log('user._id', user._id);
+        pushConnection(connectedClients, user._id, socket);
         console.log('Conneted clients: ', connectedClients);
         socket.on('message', reciveMessage(socket, user));
         socket.on('close', () => {
             console.log('Client disconnected');
-            const userId = String(user._id)
-            const theRestClients = connectedClients[userId]?.filter(sock => sock !== socket)
-            if(!theRestClients || theRestClients.length === 0) {
-                delete connectedClients[userId]
-            }else {
-                connectedClients[userId] = theRestClients
+            const userId = String(user._id);
+            const theRestClients = connectedClients[userId]?.filter((sock) => sock !== socket);
+            if (!theRestClients || theRestClients.length === 0) {
+                delete connectedClients[userId];
+            } else {
+                connectedClients[userId] = theRestClients;
             }
-            console.log('Deleted client: ', theRestClients)
         });
-        
     });
 
     function reciveMessage(client: WebSocket, user: UserWithId) {
@@ -75,9 +72,9 @@ export default function initWebSocket(app: Application) {
 
             if (mongoose.Types.ObjectId.isValid(messageObject.chatID)) {
                 const findChat = await Chat.findOne({ _id: messageObject.chatID });
-                if(findChat?.members?.find(member => member === String(user._id)) == null) {
-                    console.warn("User does not benong to this chat", messageObject.chatID)
-                    return
+                if (findChat?.members?.find((member) => member === String(user._id)) == null) {
+                    console.warn('User does not benong to this chat', messageObject.chatID);
+                    return;
                 }
                 if (messageObject.chatID === JSON.stringify(findChat?._id).replace(/"/g, '')) {
                     const newMessage = new Messages<MessagesType>({
@@ -93,12 +90,14 @@ export default function initWebSocket(app: Application) {
                 }
                 const targetClientsIDs = findChat?.members?.filter((member) => member !== messageObject.senderID);
                 console.log('Target clients IDs: ', targetClientsIDs);
-                if(targetClientsIDs) {
-                    for(const targetClientId of targetClientsIDs) {
-                        const targetClientSockets = connectedClients[String(targetClientId)]
-                        for(const targetSocket of targetClientSockets) {
-                            targetSocket.send(JSON.stringify(messageObject))
-                            console.log('Message sent to client: ', targetClientId);
+                if (targetClientsIDs) {
+                    for (const targetClientId of targetClientsIDs) {
+                        const targetClientSockets = connectedClients[String(targetClientId)];
+                        if (targetClientSockets) {
+                            for (const targetSocket of targetClientSockets) {
+                                targetSocket.send(JSON.stringify(messageObject));
+                                console.log('Message sent to client: ', targetClientId);
+                            }
                         }
                     }
                 }

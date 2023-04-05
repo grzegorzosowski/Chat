@@ -25,6 +25,14 @@ export const apiSlice = createApi({
                 body: chat,
             }),
         }),
+        findGroupChat: builder.mutation({
+            query: (chat) => ({
+                url: `api/findGroupChat`,
+                method: 'POST',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                body: chat,
+            }),
+        }),
         getMessages: builder.mutation({
             query: (chatID) => ({
                 url: `api/getMessages`,
@@ -33,10 +41,18 @@ export const apiSlice = createApi({
                 body: chatID,
             }),
         }),
+        createChat: builder.mutation({
+            query: (chatParam) => ({
+                url: `api/createChat`,
+                method: 'POST',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                body: chatParam,
+            }),
+        }),
     }),
 })
 
-export const { useFindChatMutation, useGetMessagesMutation } = apiSlice
+export const { useFindChatMutation, useGetMessagesMutation, useCreateChatMutation, useFindGroupChatMutation } = apiSlice
 
 type FindChatResult = ReturnType<typeof useFindChatMutation>;
 type FindChatData = FindChatResult extends Promise<PayloadAction<FindChatResponse>> ? ChatData : unknown;

@@ -22,7 +22,9 @@ router.get('/api/user', loggedIn, function (req: any, res, next) {
 });
 router.post('/api/getUsers', UserController.getUsers);
 router.post('/api/findChat', ChatController.findChat);
+router.post('/api/findGroupChat', ChatController.findGroupChat);
 router.post('/api/getMessages', ChatController.getMessages);
+router.post('/api/createChat', ChatController.createChat);
 router.post(
     '/api/login/password',
     passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),

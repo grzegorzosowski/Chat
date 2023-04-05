@@ -33,6 +33,7 @@ export default function ChatWindow(): JSX.Element {
         const data = JSON.parse(event.data, undefined) as MessageData;
         console.log('message : ', data);
         
+        
         console.log('senderID: ', message[message?.length - 1]?.senderID);
         console.log('userID: ', user?._id);
         if (data.chatID === activeChat.chatID) {

@@ -2,6 +2,7 @@ import User, { UserType } from '../db/models/User'
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { json } from 'body-parser';
+import Chat from '../db/models/Chat';
 
 const saltRounds = 12;
 
@@ -34,8 +35,11 @@ class UserController {
     }
 
     async getUsers (req: Request, res: Response) {
-        const users = await User.find({nick: {$ne: req.body.nick}});
-        res.json(users);
+        const users = await User.find({nick: {$ne: req.body.nick}}).select('-password');
+        console.log('req.body._id: ', req.body._id)
+        const groupChats = (await Chat.find({members: req.body._id})).filter((chat: any) => chat.members.length > 2);
+        console.log('groupChats: ', groupChats);
+        res.json({users, groupChats});
     }
 }
 

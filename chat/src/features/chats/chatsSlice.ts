@@ -4,6 +4,7 @@ interface ActiveChat {
     chatID: string;
     chatName: string;
     members: Array<string>;
+    membersNick?: Array<string>;
 }
 
 interface ChatState {
@@ -14,7 +15,8 @@ const initialState: ChatState = {
     activeChat: { 
         chatID: '1', 
         chatName: 'Chat 1', 
-        members: ['1', '2'] 
+        members: ['1', '2'],
+        membersNick: ['Nick 1', 'Nick 2'], 
     },
 };
 
