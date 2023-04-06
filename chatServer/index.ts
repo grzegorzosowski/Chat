@@ -9,7 +9,7 @@ import { initAuthentication } from "./authentication";
 import "./db/mongoose";
 import session from "express-session";
 import webSocketController from './controllers/webSocketController'
-import { sessionMiddlewear } from "./sessionMiddlewear";
+import { sessionMiddleware } from "./sessionMiddleware";
 
 const secret = process.env.SECRET || "default-secret-key";
 
@@ -20,7 +20,7 @@ const staticPath = path.join(__dirname, "public");
 
 app.use(express.static(staticPath));
 app.use(cookieParser(secret));
-app.use(sessionMiddlewear);
+app.use(sessionMiddleware);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

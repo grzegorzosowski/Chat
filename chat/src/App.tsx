@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { apiSlice } from './features/api/apiSlice';
 import { ApiProvider } from '@reduxjs/toolkit/dist/query/react';
+import { CreateAccountModal } from './components/CreateAccountModal/CreateAccountModal';
 export default function App() {
   const user = useUser();
   const isUser = !!user;
@@ -34,8 +35,13 @@ export default function App() {
   return (
     <ApiProvider api={apiSlice}>
       <Provider store={store}>
-        <main className={styles.main}>
-          <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+        <SnackbarProvider maxSnack={3} autoHideDuration={3000} >
+          {isUser
+            ? <Button className={styles.logout} onClick={handleClick} variant='outlined'>Logout</Button>
+            : <CreateAccountModal></CreateAccountModal>
+          }
+          <main className={styles.main}>
+
             <Routes>
               <Route path='/' element={
                 <ProtectedRoute isUser={!isUser} redirectPath={'/chat'} >
@@ -48,9 +54,8 @@ export default function App() {
                 </ProtectedRoute>
               } />
             </Routes>
-          </SnackbarProvider>
-          <Button onClick={handleClick}>Logout</Button>
-        </main>
+          </main>
+        </SnackbarProvider>
       </Provider>
     </ApiProvider>
   );

@@ -75,7 +75,7 @@ export default function CreateChatModal() {
 
     return (
         <Box>
-            <Button onClick={handleOpen}>Create group chat</Button>
+            <Button onClick={handleOpen} size='small' >Create group chat</Button>
             <Modal
                 open={open}
                 onClose={handleClose}

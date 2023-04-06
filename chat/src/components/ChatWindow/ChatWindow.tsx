@@ -49,7 +49,7 @@ export default function ChatWindow(): JSX.Element {
 
       ws.addEventListener('message', onMessage);
       return () => {
-        ws.removeEventListener('open', open);
+        ws.removeEventListener('open', open); 
         ws.removeEventListener('message', onMessage)
       };
     

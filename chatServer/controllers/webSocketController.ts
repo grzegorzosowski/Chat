@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 import Chat from '../db/models/Chat';
 import mongoose from 'mongoose';
 import Messages, { MessagesType } from '../db/models/Messages';
-import { sessionMiddlewear } from '../sessionMiddlewear';
+import { sessionMiddleware } from '../sessionMiddleware';
 import { UserWithId } from '../db/models/User';
 
 interface ConnectedClient {
@@ -37,8 +37,9 @@ export default function initWebSocket(app: Application) {
     const wss = new (require('ws').Server)({
         server,
         verifyClient: async (info: any, done: any) => {
-            sessionMiddlewear(info.req, {} as any, () => {
+            sessionMiddleware(info.req, {} as any, () => {
                 info.session = info.req.session;
+                console.log('info.req: ', info.req.session)
                 done(info.req.session);
             });
         },

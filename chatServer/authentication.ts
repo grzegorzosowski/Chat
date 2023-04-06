@@ -4,6 +4,7 @@ import User, { UserType } from "./db/models/User";
 import { Application } from "express";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import { sessionMiddleware } from "./sessionMiddleware";
 
 interface SerializedUser {
   _id: string;
@@ -12,8 +13,7 @@ interface SerializedUser {
 }
 
 export function initAuthentication(app: Application) {
-  app.use(passport.initialize());
-  app.use(passport.session());
+  
 
   passport.use(new LocalStrategy(verify));
 
@@ -36,6 +36,8 @@ export function initAuthentication(app: Application) {
     } catch(err) {done(err,undefined)}
     
   });
+  app.use(passport.initialize());
+  app.use(passport.session());
 }
 
 const verify = async (

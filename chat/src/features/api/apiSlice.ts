@@ -15,7 +15,7 @@ interface FindChatResponse {
 
 export const apiSlice = createApi({
     reducerPath: 'api',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3001/' }),
+    baseQuery: fetchBaseQuery({ baseUrl: '/' }),
     endpoints: (builder) => ({
         findChat: builder.mutation({
             query: (chat) => ({
@@ -49,10 +49,26 @@ export const apiSlice = createApi({
                 body: chatParam,
             }),
         }),
+        createAccount: builder.mutation({
+            query: (accountParam) => ({
+                url: `api/createAccount`,
+                method: 'POST',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                body: accountParam,
+            }),
+        }),
+        changeAccountNick: builder.mutation({
+            query: (accountParam) => ({
+                url: `api/changeAccountNick`,
+                method: 'POST',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                body: accountParam,
+            }),
+        }),
     }),
 })
 
-export const { useFindChatMutation, useGetMessagesMutation, useCreateChatMutation, useFindGroupChatMutation } = apiSlice
+export const { useFindChatMutation, useGetMessagesMutation, useCreateChatMutation, useFindGroupChatMutation, useCreateAccountMutation, useChangeAccountNickMutation } = apiSlice
 
 type FindChatResult = ReturnType<typeof useFindChatMutation>;
 type FindChatData = FindChatResult extends Promise<PayloadAction<FindChatResponse>> ? ChatData : unknown;

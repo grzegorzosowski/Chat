@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import UserController from '../controllers/userController';
 import ChatController from '../controllers/chatController';
-import { UserType } from '../db/models/User';
 const router = Router();
 import passport = require('passport');
 
@@ -21,6 +20,8 @@ router.get('/api/user', loggedIn, function (req: any, res, next) {
     res.send(userToSend);
 });
 router.post('/api/getUsers', UserController.getUsers);
+router.post('/api/createAccount', UserController.createUser);
+router.post('/api/changeAccountNick', UserController.changeUserNick);
 router.post('/api/findChat', ChatController.findChat);
 router.post('/api/findGroupChat', ChatController.findGroupChat);
 router.post('/api/getMessages', ChatController.getMessages);
@@ -43,6 +44,7 @@ router.post('/api/logout', (req, res, next) => {
 
 function loggedIn(req: any, res: any, next: any) {
     if (req.user) {
+        req.session.user = req.user;
         next();
     } else {
         res.sendStatus(401);

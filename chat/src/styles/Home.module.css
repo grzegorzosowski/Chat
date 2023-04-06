@@ -1,11 +1,26 @@
 .main {
   margin: auto;
-  padding: 4rem;
+  padding: 1rem;
   min-height: 80vh;
   width: 60%;
-  color: aliceblue;
+  color: aliceblue; 
+  justify-content: flex-start;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
+.logout {
+  position: fixed;
+  top:10px;
+  left: 10px;
+  z-index: 1000;
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
 .parent {
   width: 100%;
   height: 80vh;
