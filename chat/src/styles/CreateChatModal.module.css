@@ -8,14 +8,17 @@
     border: 2px solid #000;
     box-shadow: 24;
     padding: 20px;
-
+    border-radius: 5px;
 }
 
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+}
 .checkUserLink {
-    text-decoration: none;
-    color: #000;
-    font-size: 16px;
-    font-weight: bold;
+    text-decoration: none !important;
+    color: #000 !important;
+    font-weight: bold !important;
     cursor: pointer;
 }
 
@@ -29,6 +32,23 @@
     box-sizing: border-box;
 }
 
+.userList {
+    height: 150px;
+    overflow-y: scroll;
+    border: 1px solid rgba(50, 50, 50, 0.8);
+    border-radius: 5px;
+}
+
+.userList::-webkit-scrollbar {
+    width: 8px;
+    background-color: white;
+}
+
+.userList::-webkit-scrollbar-thumb {
+    background-color: #1976d2;
+    border-radius: 5px;
+}
+
 .selectedUsers {
     display: flex;
     flex-direction: column;
@@ -36,4 +56,29 @@
     justify-content: center;
     border: 1px solid #000;
     margin: 5px;
+}
+
+.userChecked {
+    color: rgb(22, 107, 1);
+    font-size: 20px;
+    padding-right: 5px;
+}
+
+.linkDistance {
+    display: flex;
+    font-size: 16px;
+}
+
+.buttonSubmit {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #1976d2;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    background-color: #1976d2;
+    color: #fff;
+    cursor: pointer;
 }

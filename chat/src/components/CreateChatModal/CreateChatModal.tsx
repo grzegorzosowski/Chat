@@ -3,27 +3,35 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import styles from '../../styles/CreateChatModal.module.css'
+import buttonStyle from '../../styles/ChatOption.module.css'
 import { useUser } from '../../UserProvider';
 import { useEffect, useState } from 'react';
 import { Link } from '@mui/material';
 import { useCreateChatMutation } from '../../features/api/apiSlice';
+import { enqueueSnackbar } from 'notistack';
 
 interface User {
     _id: string;
     nick: string;
 }
 
+interface UsersList {
+    users: Array<User>;
+    groupChats: Array<string>;
+}
+
 export default function CreateChatModal() {
     const user = useUser();
-    const [open, setOpen] = React.useState(false);
-    const [users, setUsers] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [users, setUsers] = useState<User[]>([]);
     const [newChatUsers, setNewChatUsers] = useState<Array<User>>([]);
     const [newChatName, setNewChatName] = useState<string>('');
     const [usersFetched, setUsersFetched] = useState<boolean>(false);
     const [createChat] = useCreateChatMutation();
     const handleOpen = () => {
-        setOpen(true); 
+        setOpen(true);
     }
     const handleClose = () => {
         setNewChatUsers([]);
@@ -34,15 +42,13 @@ export default function CreateChatModal() {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        body: JSON.stringify({ nick: user?.nick }),
+        body: JSON.stringify({ nick: user?.nick } as Record<string, unknown>),
     };
     useEffect(() => {
         function getUsers() {
             fetch('/api/getUsers', requestOptions)
                 .then((response) => response.json())
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-                .then((data) => { setUsers(data.users) })
+                .then((data: UsersList) => { setUsers(data?.users) })
                 .catch((error) => console.log(error));
         }
         if (!usersFetched) {
@@ -52,16 +58,23 @@ export default function CreateChatModal() {
     }, []);
 
     const handleSubmit = () => {
-        console.log('Lista wybranych użytkowników: ', newChatUsers);
-        createChat({
-            chatName: newChatName,
-            members: newChatUsers,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            createdBy: user?._id,
-        })
-            .unwrap()
-            .then((result) => console.log('Result: ', result))
-            .catch((error) => console.log('Error: ', error));
+        if (newChatUsers.length === 0) {
+            enqueueSnackbar('No users checked', { variant: 'error' });
+        } else if (!newChatName) {
+            enqueueSnackbar('No chat name', { variant: 'error' });
+        } else {
+            createChat({
+                chatName: newChatName,
+                members: newChatUsers,
+                createdBy: user?._id as string
+            })
+                .unwrap()
+                .then((result) => {
+                    console.log('Result: ', result)
+                    window.location.reload();
+                })
+                .catch((error) => console.log('Error: ', error));
+        }
 
     }
 
@@ -70,12 +83,14 @@ export default function CreateChatModal() {
         console.log('Name of chat: ', newChatName);
         if (!newChatUsers.find((user: User) => user._id === userLink._id)) {
             setNewChatUsers([...newChatUsers, userLink]);
+        } else {
+            setNewChatUsers(newChatUsers.filter((user: User) => user._id !== userLink._id));
         }
     }
 
     return (
         <Box>
-            <Button onClick={handleOpen} size='small' >Create group chat</Button>
+            <Button onClick={handleOpen} size='small' className={buttonStyle.buttonStyle} >Create group chat</Button>
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -83,24 +98,29 @@ export default function CreateChatModal() {
                 aria-describedby="modal-modal-description"
             >
                 <Box className={styles.modalStyle}>
-                    <>
-                        <Box value={newChatName} component='input' placeholder='Chat name' className={styles.inputStyle} onChange={(event) => setNewChatName(event.target.value)} />
-                        {newChatUsers.map((user: User) =>
-                            <Box component='span' key={user._id} className={styles.selectedUsers}>
-                                {user.nick}
-                            </Box>
-                        )}
-                        <Typography id="modal-modal-description">
-                            Add users to chat:
-                        </Typography>
+                    <Typography variant='h6' className={styles.title} >CREATE GROUP CHAT</Typography>
+                    <Box value={newChatName} component='input' placeholder='Chat name' className={styles.inputStyle} onChange={(event) => setNewChatName(event.target.value)} />
+                    <Typography id="modal-modal-description">
+                        Add users to chat:
+                    </Typography>
+                    <Box className={styles.userList}>
                         {usersFetched && users && users.map((user: User) =>
                             <Link key={user._id} className={styles.checkUserLink} onClick={() => handleClick(user)}>
-                                <Box>{user.nick}</Box>
+                                {newChatUsers.includes(user)
+                                    ? <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                    : <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                }
                             </Link>
                         )
                         }
-                        <Box component='button' onClick={handleSubmit}>CREATE</Box>
-                    </>
+                    </Box>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        sx={{ display: 'block', px: 5, m: '15px auto 0 auto' }}
+                        onClick={handleSubmit}>CREATE</Button>
                 </Box>
 
             </Modal>

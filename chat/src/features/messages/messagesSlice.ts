@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Message {
     messageID: number;
-    senderID: object;
+    senderID: string;
     chatID: string;
     message: string;
     timestamp: string;
@@ -16,7 +16,7 @@ const initialState: MessagesState = {
     messages: [
         {
             messageID: 1,
-            senderID: {},
+            senderID: '1',
             chatID: '1',
             message: '',
             timestamp: new Date().toISOString(),

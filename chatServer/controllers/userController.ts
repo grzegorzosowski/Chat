@@ -12,7 +12,7 @@ declare module 'express-session' {
 }
 class UserController {
     async createUser(req: Request, res: Response) {
-        const userName = req.body.userNewNick;
+        const userName = req.body.userNick;
         const userEmail = req.body.userEmail;
         const userPassword = req.body.userPassword;
         console.log('Creating user...');

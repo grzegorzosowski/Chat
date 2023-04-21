@@ -3,26 +3,21 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import styles from '../../styles/CreateAccountModal.module.css'
+import buttonStyle from '../../styles/ChatOption.module.css'
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import InputPassword from '../InputPassword/InputPassword';
 import { useChangeAccountNickMutation } from '../../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
 import { useUser } from '../../UserProvider';
-interface FormState {
-    userNick: string;
-}
 
 export function ChangeAccountParam() {
     const user = useUser();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const [form, setForm] = useState<FormState>({ userNick: user?.nick});
+    const [form, setForm] = useState({ userNick: user?.nick } as Record<string, unknown>);
     const [open, setOpen] = React.useState(false);
     const { enqueueSnackbar } = useSnackbar();
     const [changeNickFetch] = useChangeAccountNickMutation();
     const handleOpen = () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        setForm({userNick: user?.nick});
+        setForm({ userNick: user?.nick });
         setOpen(true);
     }
     const handleClose = () => {
@@ -40,7 +35,7 @@ export function ChangeAccountParam() {
                 handleClose();
             })
             .catch((error) => {
-                
+
                 console.log(error);
             })
     }
@@ -57,7 +52,7 @@ export function ChangeAccountParam() {
 
     return (
         <Box>
-            <Button onClick={handleOpen}>Change Nick</Button>
+            <Button onClick={handleOpen} className={buttonStyle.buttonStyle}>Change my nick</Button>
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -75,7 +70,7 @@ export function ChangeAccountParam() {
                                 type="text"
                                 size="small"
                             ></TextField>
-                            
+
                             <Button
                                 type="submit"
                                 variant="contained"

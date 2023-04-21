@@ -1,74 +1,107 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { PayloadAction } from '@reduxjs/toolkit';
 
 interface ChatData {
-  // zdefiniuj tutaj właściwości twoich danych czatu
     chatID: string;
     chatName: string;
     members: Array<string>;
 }
 
 interface FindChatResponse {
-  data: ChatData;
+    data: ChatData;
 }
 
+interface Chat {
+    id1: string;
+    id2: string;
+    nick1: string;
+    nick2: string;
+}
+
+interface GroupChat {
+    groupChatID: string;
+}
+
+interface ChatID {
+    chatID: string;
+}
+interface User {
+    _id: string;
+    nick: string;
+}
+interface CreateChat {
+    chatName: string;
+    members: Array<User>;
+    createdBy: string;
+}
+
+interface CreateAccount {
+    userEmail: string;
+    userNick: string;
+    userPassword: string;
+}
+
+interface ChangeAccount {
+    userNick: unknown;
+}
 
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({ baseUrl: '/' }),
     endpoints: (builder) => ({
         findChat: builder.mutation({
-            query: (chat) => ({
+            query: (chat: Chat) => ({
                 url: `api/findChat`,
                 method: 'POST',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 body: chat,
             }),
         }),
         findGroupChat: builder.mutation({
-            query: (chat) => ({
+            query: (chat: GroupChat) => ({
                 url: `api/findGroupChat`,
                 method: 'POST',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 body: chat,
             }),
         }),
         getMessages: builder.mutation({
-            query: (chatID) => ({
+            query: (chatID: ChatID) => ({
                 url: `api/getMessages`,
                 method: 'POST',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 body: chatID,
             }),
         }),
         createChat: builder.mutation({
-            query: (chatParam) => ({
+            query: (chatParam: CreateChat) => ({
                 url: `api/createChat`,
                 method: 'POST',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 body: chatParam,
             }),
         }),
         createAccount: builder.mutation({
-            query: (accountParam) => ({
+            query: (accountParam: CreateAccount) => ({
                 url: `api/createAccount`,
                 method: 'POST',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 body: accountParam,
             }),
         }),
         changeAccountNick: builder.mutation({
-            query: (accountParam) => ({
+            query: (accountParam: ChangeAccount) => ({
                 url: `api/changeAccountNick`,
                 method: 'POST',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 body: accountParam,
             }),
         }),
     }),
-})
+});
 
-export const { useFindChatMutation, useGetMessagesMutation, useCreateChatMutation, useFindGroupChatMutation, useCreateAccountMutation, useChangeAccountNickMutation } = apiSlice
+export const {
+    useFindChatMutation,
+    useGetMessagesMutation,
+    useCreateChatMutation,
+    useFindGroupChatMutation,
+    useCreateAccountMutation,
+    useChangeAccountNickMutation,
+} = apiSlice;
 
 type FindChatResult = ReturnType<typeof useFindChatMutation>;
 type FindChatData = FindChatResult extends Promise<PayloadAction<FindChatResponse>> ? ChatData : unknown;

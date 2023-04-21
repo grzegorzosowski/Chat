@@ -5,18 +5,30 @@
     height: 100%;
     padding: 1rem;
     box-sizing: border-box;
-    border-radius: 20px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     flex-flow: column nowrap;
     overflow-y: auto;
     max-height: 100%;
 }
-.main  > :first-child {
+.main > :first-child {
     margin-top: auto !important;
 }
+
+.main::-webkit-scrollbar {
+    width: 8px;
+    background-color: #f5f5f5;
+    border-radius: 0 10px 10px 0;
+}
+
+.main::-webkit-scrollbar-thumb {
+    background-color: gray;
+    border-radius: 4px;
+}
+
 .myMessage {
-    background-color: #BBD6B8;
+    background-color: #bbd6b8;
     padding: 4px 10px;
     margin-bottom: 5px;
     border-radius: 10px;

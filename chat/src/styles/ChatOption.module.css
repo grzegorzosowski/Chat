@@ -5,6 +5,8 @@
     padding: 10px;
     border-radius: 10px;
     background-color: #f5f5f5;
+    opacity: 0.8;
+    width: 100%;
 }
 
 .linkStyle {
@@ -12,3 +14,7 @@
     text-decoration: none;
 }
 
+.buttonStyle {
+    width: 100%;
+    justify-content: left;
+}

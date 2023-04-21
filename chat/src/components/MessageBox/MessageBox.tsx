@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import styles from '../../styles/MessageBox.module.css'
 import { webSocket } from '../../webSocketConfig'
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { addMessage } from '../../features/messages/messagesSlice';
 import { useUser } from '../../UserProvider';
+import { Box } from '@mui/material';
 
 
 
@@ -12,7 +12,6 @@ export default function MessageBox(): JSX.Element {
     const [messageText, setMessageText] = useState<string>('');
     const dispatch = useAppDispatch();
     const messages = useAppSelector((state) => state.messages.messages)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     const activeChat = useAppSelector((state) => state.activeChat.activeChat)
     useEffect(() => {
         if (user) {
@@ -39,8 +38,7 @@ export default function MessageBox(): JSX.Element {
                 console.log('Message: ', messages);
                 const newMessage = {
                     messageID: (messages[messages?.length - 1]?.messageID + 1) || 1,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    senderID: user?._id,
+                    senderID: user?._id as string,
                     chatID: activeChat.chatID,
                     message: messageText,
                     timestamp: new Date().toISOString(),
@@ -60,11 +58,19 @@ export default function MessageBox(): JSX.Element {
     };
 
     return (
-        <textarea
-            className={styles.messageInput}
+        <Box
+            component='textarea'
             value={messageText}
             onChange={onChange}
             onKeyDown={handleKeyPress}
-        ></textarea>
+            sx={{
+                width: '100%',
+                height: '100%',
+                padding: '5px',
+                boxSizing: 'border-box',
+                opacity: '0.9',
+                resize: 'none',
+            }}
+        ></Box>
     )
 }

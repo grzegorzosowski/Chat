@@ -9,7 +9,7 @@ import { setActiveChat } from '../../features/chats/chatsSlice';
 import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation } from '../../features/api/apiSlice';
 import { putMessages } from '../../features/messages/messagesSlice';
 import GroupChat from '../GroupChat/GroupChat';
-import { Tooltip } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 interface User {
   _id: string;
   nick: string;
@@ -21,11 +21,29 @@ interface GroupChat {
   membersNick: string[];
 }
 
+interface ResponseData {
+  users: User[];
+  groupChats: GroupChat[];
+}
+type Result = {
+  _id: string;
+  members: string[];
+  chatName: string;
+}
+
+interface Message {
+  messageID: number;
+  senderID: string;
+  chatID: string;
+  message: string;
+  timestamp: string;
+}
+
 export default function UserList(): JSX.Element {
   const user = useUser();
   const dispatch = useAppDispatch();
-  const [users, setUsers] = useState([]);
-  const [groupChats, setGroupChats] = useState([]); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [users, setUsers] = useState<User[]>([]);
+  const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
@@ -33,15 +51,13 @@ export default function UserList(): JSX.Element {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    body: JSON.stringify({ nick: user?.nick, _id: user?._id }),
+    body: JSON.stringify({ nick: user?.nick, _id: user?._id } as Record<string, unknown>),
   };
   useEffect(() => {
     function getUsers() {
       fetch('/api/getUsers', requestOptions)
         .then((response) => response.json())
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        .then((data) => { setGroupChats(data?.groupChats); setUsers(data?.users) })
+        .then((data: ResponseData) => { setGroupChats(data?.groupChats); setUsers(data?.users) })
         .catch((error) => console.log(error));
     }
     if (!usersFetched) {
@@ -50,68 +66,60 @@ export default function UserList(): JSX.Element {
     }
   }, []);
 
-  const handleClick = (userLink: User | GroupChat ) => {
+  const handleClick = (userLink: User | GroupChat) => {
     console.log('Kliknięto na: ', userLink._id);
-    if('nick' in userLink) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    findChat({ id1: user?._id, id2: userLink._id, nick1: user?.nick, nick2: userLink?.nick })
-      .unwrap()
-      .then((result) => {
-        const newChat = {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          chatID: result?._id,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          members: result?.members,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          chatName: result?.chatName,
-        };
-        dispatch(setActiveChat(newChat));
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        getMessages({ chatID: newChat.chatID })
-          .unwrap()
-          .then((result) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            dispatch(putMessages(result));
-          })
-          .catch((error) => console.log(error));
-      })
-      .catch((error) => console.log(error));
-    } else {
+    console.log('UserLink: ', userLink);
+    if ('nick' in userLink) {  // ### if userLink has nick property, it's a user, not group ### //
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      findGroupChat({groupChatID: userLink._id})
-      .unwrap()
-      .then((result) => {
-        console.log(result)
-        const newChat = {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          chatID: result?._id,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          members: result?.members,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          chatName: result?.chatName,
-        };
-        dispatch(setActiveChat(newChat));
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        getMessages({ chatID: newChat.chatID })
-          .unwrap()
-          .then((result) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            dispatch(putMessages(result));
-          })
-          .catch((error) => console.log(error));
-      })
-      .catch((error) => console.log(error));
+      findChat({ id1: user?._id, id2: userLink._id, nick1: user?.nick, nick2: userLink?.nick })
+        .unwrap()
+        .then((result: Result) => {
+          const newChat = {
+            chatID: result?._id,
+            members: result?.members,
+            chatName: result?.chatName,
+          };
+          dispatch(setActiveChat(newChat));
+          getMessages({ chatID: newChat.chatID })
+            .unwrap()
+            .then((result: Message[]) => {
+              dispatch(putMessages(result));
+            })
+            .catch((error) => console.log(error));
+        })
+        .catch((error) => console.log(error));
+    } else {
+      findGroupChat({ groupChatID: userLink._id })
+        .unwrap()
+        .then((result: Result) => {
+          console.log(result)
+          const newChat = {
+            chatID: result?._id,
+            members: result?.members,
+            chatName: result?.chatName,
+          };
+          dispatch(setActiveChat(newChat));
+          getMessages({ chatID: newChat.chatID })
+            .unwrap()
+            .then((result: Message[]) => {
+              dispatch(putMessages(result));
+            })
+            .catch((error) => console.log(error));
+        })
+        .catch((error) => console.log(error));
     }
   }
 
 
   return (
     <Box className={styles.shape}>
+      <Typography variant='body1' color='gray'>USERS</Typography>
       {users && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
         <User key={user.nick} user={user}></User>
       </Link>)}
+      <Typography variant='body1' color='gray'>GROUPS</Typography>
       {groupChats && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'s'}>
-        <Link key={groupChat._id} onClick={() => handleClick(groupChat)}  underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
+        <Link key={groupChat._id} onClick={() => handleClick(groupChat)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
           <GroupChat groupChat={groupChat} ></GroupChat></Link>
       </Tooltip>)}
     </Box>

@@ -41,7 +41,7 @@ export function CreateAccountModal() {
                 handleClose();
             })
             .catch((error) => {
-                
+
                 console.log(error);
             })
     }
@@ -58,7 +58,7 @@ export function CreateAccountModal() {
 
     return (
         <Box>
-            <Button onClick={handleOpen}>Create account</Button>
+            <Button onClick={handleOpen} variant='outlined' sx={{ position: 'fixed', left: '10px', top: '10px' }}>Create account</Button>
             <Modal
                 open={open}
                 onClose={handleClose}

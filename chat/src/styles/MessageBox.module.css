@@ -8,4 +8,5 @@
     padding: 5px;
     box-sizing: border-box;
     opacity: 0.9;
+    resize: none;
 }

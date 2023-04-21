@@ -49,14 +49,14 @@ export default function LoginPage() {
     <Box
       sx={{
         width: 1,
-        maxWidth: '60%',
-        textAlign: 'center',
+        maxWidth: '40%',
+        margin: 'auto',
         bgcolor: 'white',
         padding: 3,
         borderRadius: 2,
       }}
     >
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column'}}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column' }}>
         <TextField
           value={form.userEmail}
           onChange={(event) => setForm({ ...form, userEmail: event.target.value })}

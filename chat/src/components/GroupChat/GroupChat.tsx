@@ -3,18 +3,18 @@ import styles from '../../styles/User.module.css'
 import { useAppSelector } from '../../hooks'
 
 interface GroupChatProps {
-   groupChat: { _id: string;
-    chatName: string;
-    members: string[];}
+    groupChat: {
+        _id: string;
+        chatName: string;
+        members: string[];
+    }
 }
 
 
 export default function GroupChat(groupChat: GroupChatProps): JSX.Element {
     const activeChat = useAppSelector((state) => state.activeChat)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const id = groupChat.groupChat._id;
-    const nick = groupChat. groupChat.chatName;
+    const nick = groupChat.groupChat.chatName;
     const active = activeChat.activeChat.chatID.includes(id);
 
     return (
