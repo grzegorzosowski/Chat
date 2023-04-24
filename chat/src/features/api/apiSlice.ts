@@ -45,6 +45,10 @@ interface ChangeAccount {
     userNick: unknown;
 }
 
+interface GetNick {
+    userID: string;
+}
+
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({ baseUrl: '/' }),
@@ -68,6 +72,13 @@ export const apiSlice = createApi({
                 url: `api/getMessages`,
                 method: 'POST',
                 body: chatID,
+            }),
+        }),
+        getUserNick: builder.mutation({
+            query: (userID: GetNick) => ({
+                url: `api/getUserNick`,
+                method: 'POST',
+                body: userID,
             }),
         }),
         createChat: builder.mutation({
@@ -97,6 +108,7 @@ export const apiSlice = createApi({
 export const {
     useFindChatMutation,
     useGetMessagesMutation,
+    useGetUserNickMutation,
     useCreateChatMutation,
     useFindGroupChatMutation,
     useCreateAccountMutation,

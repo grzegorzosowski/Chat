@@ -4,7 +4,6 @@ import ChatController from '../controllers/chatController';
 const router = Router();
 import passport = require('passport');
 
-
 router.get('/', (req, res) => {
     res.send('Hello, World!');
     console.log('JEst komunikacja');
@@ -20,6 +19,7 @@ router.get('/api/user', loggedIn, function (req: any, res, next) {
     res.send(userToSend);
 });
 router.post('/api/getUsers', UserController.getUsers);
+router.post('/api/getUserNick', UserController.getUserNick);
 router.post('/api/createAccount', UserController.createUser);
 router.post('/api/changeAccountNick', UserController.changeUserNick);
 router.post('/api/findChat', ChatController.findChat);

@@ -57,12 +57,21 @@ export default function MessageBox(): JSX.Element {
         }
     };
 
+    const placeholderSwitch = () => {
+        if (activeChat.chatID === '1') {
+            return "Select chat to send message"
+        } else {
+            return "Type a message and press enter to send"
+        }
+    }
+
     return (
         <Box
             component='textarea'
             value={messageText}
             onChange={onChange}
             onKeyDown={handleKeyPress}
+            placeholder={placeholderSwitch()}
             sx={{
                 width: '100%',
                 height: '100%',

@@ -35,6 +35,7 @@ export default function CreateChatModal() {
     }
     const handleClose = () => {
         setNewChatUsers([]);
+        setNewChatName('');
         setOpen(false);
     }
 

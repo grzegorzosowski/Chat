@@ -4,11 +4,11 @@ export type UserType = {
     nick: string;
     email: string;
     password: string;
-}
+};
 
 export type UserWithId = {
-    _id: mongoose.ObjectId
-} & UserType
+    _id: mongoose.ObjectId;
+} & UserType;
 
 const UserSchema = new mongoose.Schema<UserType>({
     nick: {

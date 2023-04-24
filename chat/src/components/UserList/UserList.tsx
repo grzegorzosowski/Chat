@@ -5,7 +5,7 @@ import User from '../User/User'
 import styles from '../../styles/UserList.module.css'
 import Link from '@mui/material/Link';
 import { useAppDispatch } from '../../hooks';
-import { setActiveChat } from '../../features/chats/chatsSlice';
+import { setActiveChat, setGettingChat } from '../../features/chats/chatsSlice';
 import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation } from '../../features/api/apiSlice';
 import { putMessages } from '../../features/messages/messagesSlice';
 import GroupChat from '../GroupChat/GroupChat';
@@ -67,11 +67,12 @@ export default function UserList(): JSX.Element {
   }, []);
 
   const handleClick = (userLink: User | GroupChat) => {
-    console.log('Kliknięto na: ', userLink._id);
-    console.log('UserLink: ', userLink);
+    if (user == null) {
+      return;
+    }
+    dispatch(setGettingChat(true));
     if ('nick' in userLink) {  // ### if userLink has nick property, it's a user, not group ### //
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      findChat({ id1: user?._id, id2: userLink._id, nick1: user?.nick, nick2: userLink?.nick })
+      findChat({ id1: user._id, id2: userLink._id, nick1: user.nick, nick2: userLink?.nick })
         .unwrap()
         .then((result: Result) => {
           const newChat = {
@@ -84,6 +85,7 @@ export default function UserList(): JSX.Element {
             .unwrap()
             .then((result: Message[]) => {
               dispatch(putMessages(result));
+              dispatch(setGettingChat(false));
             })
             .catch((error) => console.log(error));
         })
@@ -92,7 +94,6 @@ export default function UserList(): JSX.Element {
       findGroupChat({ groupChatID: userLink._id })
         .unwrap()
         .then((result: Result) => {
-          console.log(result)
           const newChat = {
             chatID: result?._id,
             members: result?.members,
@@ -103,6 +104,7 @@ export default function UserList(): JSX.Element {
             .unwrap()
             .then((result: Message[]) => {
               dispatch(putMessages(result));
+              dispatch(setGettingChat(false));
             })
             .catch((error) => console.log(error));
         })

@@ -1,10 +1,13 @@
-import { Box, Tooltip } from '@mui/material';
-import { useEffect, useRef } from 'react'
+import { Box, Tooltip, Typography } from '@mui/material';
+import { useEffect, useRef, useState } from 'react'
 import { webSocket } from '../../webSocketConfig'
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import styles from '../../styles/ChatWindow.module.css'
 import { useUser } from '../../UserProvider';
 import { addMessage } from '../../features/messages/messagesSlice';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useGetUserNickMutation } from '../../features/api/apiSlice';
+
 
 interface MessageData {
   messageID: number;
@@ -17,12 +20,14 @@ interface MessageData {
 
 export default function ChatWindow(): JSX.Element {
   const user = useUser();
+  const [userNick, setUserNick] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const message = useAppSelector((state) => state.messages.messages)
   const activeChat = useAppSelector((state) => state.activeChat.activeChat);
+  const gettingChat = useAppSelector((state) => state.activeChat.gettingChat);
+  const [getUserNick] = useGetUserNickMutation();
   const dispatch = useAppDispatch();
   useEffect(() => {
-    console.log('Messages from store: ', message);
     const ws = webSocket;
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
@@ -35,11 +40,6 @@ export default function ChatWindow(): JSX.Element {
 
     const onMessage = (event: MessageEvent<string>) => {
       const data = JSON.parse(event.data, undefined) as MessageData;
-      console.log('message : ', data);
-
-
-      console.log('senderID: ', message[message?.length - 1]?.senderID);
-      console.log('userID: ', user?._id);
       if (data.chatID === activeChat.chatID) {
         dispatch(addMessage({
           messageID: data.messageID,
@@ -59,18 +59,48 @@ export default function ChatWindow(): JSX.Element {
 
   }, [dispatch, message]);
 
-
+  const onTooltipOpen = async (data: string) => {
+    setUserNick('');
+    await getUserNick({ userID: data })
+      .unwrap()
+      .then((res: string) => {
+        setUserNick(res);
+      })
+      .catch(() => {
+        setUserNick('Error');
+      })
+  }
   return (
     <>
       <Box className={styles.main} ref={containerRef}>
-        {activeChat.chatID !== '1' && message.map(mess => <Tooltip key={mess.messageID} title={mess.timestamp.toString()}>
-          {mess.senderID === user?._id ?
-            <Box className={styles.myMessage}>{mess.message}</Box> :
-            <Box className={styles.othersMessage}>{mess.message}</Box>
-          }
-        </Tooltip>)}
+        {gettingChat ? <Loader /> :
+          <>{activeChat.chatID !== '1' && message.map(mess =>
+            <Tooltip
+              key={mess.messageID}
+              title={userNick !== '' &&
+                <>
+                  <Typography variant="caption" sx={{ display: 'block' }}>{userNick}</Typography>
+                  <Typography variant="caption" >{mess.timestamp.toString()}</Typography>
+                </>
+              }
+              onOpen={() => void onTooltipOpen(mess.senderID)}>
+              {mess.senderID === user?._id ?
+                <Box className={styles.myMessage}>{mess.message}</Box> :
+                <Box className={styles.othersMessage}>{mess.message}</Box>
+              }
+            </Tooltip>)}
+          </>
+        }
       </Box>
     </>
+  )
+}
+
+const Loader = () => {
+  return (
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <CircularProgress size={50} />
+    </Box>
   )
 }
 

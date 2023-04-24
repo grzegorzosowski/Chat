@@ -1,7 +1,13 @@
 import React from 'react';
 import { useContext, useEffect, useState, createContext } from 'react';
 
-const Context = createContext<Record<string, any> | undefined>(undefined);
+export type User = {
+    _id: string;
+    nick: string;
+    email: string;
+}
+
+const Context = createContext<User | undefined>(undefined);
 
 export function useUser() {
     return useContext(Context);
@@ -13,13 +19,13 @@ interface UserProviderType {
 
 export function UserProvider({ children }: UserProviderType) {
     const [isLoading, setIsLoading] = useState(true);
-    const [user, setUser] = useState<Record<string, any> | undefined>();
+    const [user, setUser] = useState<User | undefined>();
 
 
     useEffect(() => {
         setIsLoading(true);
         fetch('api/user', { method: 'GET' })
-            .then((res) => res.json() as Promise<Record<string, any>>)
+            .then((res) => res.json() as Promise<User>)
             .then((user) => {
                 setUser(user);
             })

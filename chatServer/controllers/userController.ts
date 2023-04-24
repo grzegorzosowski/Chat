@@ -46,12 +46,18 @@ class UserController {
         res.status(200).json(changedNick?.nick);
     }
 
+    async getUserNick(req: Request, res: Response) {
+        const userID = req.body.userID;
+        const userNick = await User.findById(userID).select('nick');
+        res.status(200).json(userNick?.nick);
+    }
+
     async getUsers(req: Request, res: Response) {
         const users = await User.find({ nick: { $ne: req.body.nick } }).select('-password');
         console.log('req.body._id: ', req.body._id);
         const groupChats = (await Chat.find({ members: req.body._id })).filter((chat: any) => chat.members.length > 2);
         console.log('groupChats: ', groupChats);
-        
+
         res.json({ users, groupChats });
     }
 }
