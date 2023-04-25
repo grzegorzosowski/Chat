@@ -104,15 +104,21 @@ export default function CreateChatModal() {
                     <Typography id="modal-modal-description">
                         Add users to chat:
                     </Typography>
+
                     <Box className={styles.userList}>
-                        {usersFetched && users && users.map((user: User) =>
-                            <Link key={user._id} className={styles.checkUserLink} onClick={() => handleClick(user)}>
-                                {newChatUsers.includes(user)
-                                    ? <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
-                                    : <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
-                                }
-                            </Link>
-                        )
+                        {users.length > 0 ?
+                            <>{usersFetched && users && users.map((user: User) =>
+                                <Link key={user._id} className={styles.checkUserLink} onClick={() => handleClick(user)}>
+                                    {newChatUsers.includes(user)
+                                        ? <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                        : <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                    }
+                                </Link>
+                            )
+                            }</>
+                            : <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                <Typography >There is no another users</Typography>
+                            </Box>
                         }
                     </Box>
                     <Button
