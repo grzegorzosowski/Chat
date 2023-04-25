@@ -21,10 +21,16 @@ class UserController {
         if (passwordValidationResult.includes(false)) {
             return res.status(422).json({ message: 'Password is not valid' });
         }
+        if (userName.length < 3) {
+            return res.status(422).json({ message: 'Nick is too short' });
+        }
+        if (userEmail === '' || !userEmail.includes('@')) {
+            return res.status(422).json({ message: 'Email is not valid' });
+        }
         try {
             const checkUserExist = await User.findOne({ email: userEmail });
             if (checkUserExist) {
-                return res.status(422).json({ message: 'This email already exists inside our user database' });
+                return res.status(422).json({ message: 'This email already exists' });
             }
 
             const hashedPassword = await bcrypt.hash(userPassword, saltRounds);

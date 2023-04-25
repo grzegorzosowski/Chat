@@ -50,7 +50,11 @@ export function CreateAccountModal() {
 
     const handleSubmit = (event: React.FormEvent<Element>) => {
         event.preventDefault();
-        if (!validationDone) {
+        if (form.userEmail === "") {
+            enqueueSnackbar('Email is required', { variant: 'error' });
+        } else if (form.userNick.length < 3) {
+            enqueueSnackbar('Nick require at least 3 signs', { variant: 'error' });
+        } else if (!validationDone) {
             enqueueSnackbar('Password is not valid', { variant: 'error' });
         } else if (form.userPassword !== form.userPasswordRepeat && validationDone) {
             enqueueSnackbar('Passwords are not the same', { variant: 'error' });
