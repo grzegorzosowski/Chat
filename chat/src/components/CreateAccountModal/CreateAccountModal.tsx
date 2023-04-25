@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import InputPassword from '../InputPassword/InputPassword';
 import { useCreateAccountMutation } from '../../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
+import PassValidator from '../PassValidator/passValidator';
 interface FormState {
     userEmail: string;
     userNick: string;
@@ -17,7 +18,8 @@ interface FormState {
 
 export function CreateAccountModal() {
     const [form, setForm] = useState<FormState>({ userEmail: '', userNick: '', userPassword: '', userPasswordRepeat: '' });
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [validationDone, setValidationDone] = useState(false);
     const { enqueueSnackbar } = useSnackbar();
     const [createAccountFetch] = useCreateAccountMutation();
     const handleOpen = () => {
@@ -48,10 +50,12 @@ export function CreateAccountModal() {
 
     const handleSubmit = (event: React.FormEvent<Element>) => {
         event.preventDefault();
-        if (form.userPassword === form.userPasswordRepeat) {
-            void createAccount();
-        } else {
+        if (!validationDone) {
+            enqueueSnackbar('Password is not valid', { variant: 'error' });
+        } else if (form.userPassword !== form.userPasswordRepeat && validationDone) {
             enqueueSnackbar('Passwords are not the same', { variant: 'error' });
+        } else {
+            void createAccount();
         }
     }
 
@@ -94,6 +98,7 @@ export function CreateAccountModal() {
                                 onChange={(event) => setForm({ ...form, userPasswordRepeat: event.target.value })}
                                 text={'Password'}
                             ></InputPassword>
+                            <PassValidator password={form.userPassword} passwordCorrect={setValidationDone}></PassValidator>
                             <Button
                                 type="submit"
                                 variant="contained"

@@ -1,7 +1,8 @@
-import User, { UserWithId, UserType } from '../db/models/User';
+import User, { UserType } from '../db/models/User';
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import Chat from '../db/models/Chat';
+import passwordValidation from '../../chat/src/features/passwordValidation/passwordValidation';
 
 const saltRounds = 12;
 
@@ -16,7 +17,10 @@ class UserController {
         const userEmail = req.body.userEmail;
         const userPassword = req.body.userPassword;
         console.log('Creating user...');
-
+        const passwordValidationResult = passwordValidation(userPassword);
+        if (passwordValidationResult.includes(false)) {
+            return res.status(422).json({ message: 'Password is not valid' });
+        }
         try {
             const checkUserExist = await User.findOne({ email: userEmail });
             if (checkUserExist) {
