@@ -57,7 +57,7 @@ export default function UserList(): JSX.Element {
     function getUsers() {
       fetch('/api/getUsers', requestOptions)
         .then((response) => response.json())
-        .then((data: ResponseData) => { setGroupChats(data?.groupChats); setUsers(data?.users) })
+        .then((data: ResponseData) => { setGroupChats(data.groupChats); setUsers(data.users) })
         .catch((error) => console.log(error));
     }
     if (!usersFetched) {
@@ -116,11 +116,11 @@ export default function UserList(): JSX.Element {
   return (
     <Box className={styles.shape}>
       <Typography variant='body1' color='gray'>USERS</Typography>
-      {users && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
+      {users.length > 0 && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
         <User key={user.nick} user={user}></User>
       </Link>)}
       <Typography variant='body1' color='gray'>GROUPS</Typography>
-      {groupChats && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'s'}>
+      {groupChats.length > 0 && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'s'}>
         <Link key={groupChat._id} onClick={() => handleClick(groupChat)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
           <GroupChat groupChat={groupChat} ></GroupChat></Link>
       </Tooltip>)}
