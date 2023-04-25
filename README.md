@@ -26,9 +26,9 @@ Website has only two pages: login page and chat page.
 
 ## To run project
 
-<ul>
-  <li>1. Clone repository</li>
-  <li>2. npm install</li>
-  <li>3. npm start</li>
-</ul>
+1. Clone repository
+2. Go to project directory:
+   1. Setup project using command `npm install`
+3. Run app using command `npm start`. Project will be available on `http://localhost:3000/`
+
 To see every feature of website,  you should create at least 3 users. First account is yours, second account to single chat and third account to create group chat.
