@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "cd chat && npm start",
+    "start:backend": "cd chatServer && npx nodemon"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
+}
