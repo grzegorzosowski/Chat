@@ -1,0 +1,14 @@
+services:
+  mongo:
+    image: mongodb/mongodb-community-server:6.0.4-ubi8
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root_password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/dbChat
+
+volumes:
+  mongo-data:
