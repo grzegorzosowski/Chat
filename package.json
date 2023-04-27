@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start": "concurrently \"docker-compose up -d\" \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "cd chat && npm install && npm start",
     "start:backend": "cd chatServer && npm install && npx nodemon"
   },
