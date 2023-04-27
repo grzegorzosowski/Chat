@@ -3,6 +3,13 @@
 Hi, I'm Grzegorz,
 I made this app to learn and practice Redux toolkit and WebSocket protocol.
 
+## Working on features
+
+<ul>
+  <li>Moblie view</li>
+  <li>Downloading messages to file</li>
+</ul>
+
 ## Project description
 
 Project was made as small chat app for internal use.
@@ -31,4 +38,4 @@ Website has only two pages: login page and chat page.
    1. Setup project using command `npm install`
 3. Run app using command `npm start`. Project will be available on `http://localhost:3000/`
 
-To see every feature of website,  you should create at least 3 users. First account is yours, second account to single chat and third account to create group chat.
+To see every feature of website, you should create at least 3 users. First account is yours, second account to single chat and third account to create group chat.
