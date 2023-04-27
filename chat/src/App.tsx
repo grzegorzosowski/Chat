@@ -5,15 +5,18 @@ import styles from './styles/Home.module.css'
 import { useUser } from './UserProvider';
 import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { SnackbarProvider } from 'notistack';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { apiSlice } from './features/api/apiSlice';
 import { ApiProvider } from '@reduxjs/toolkit/dist/query/react';
 import { CreateAccountModal } from './components/CreateAccountModal/CreateAccountModal';
+import { useIsMobile } from './features/useIsMobile';
+
 export default function App() {
   const user = useUser();
   const isUser = !!user;
+  const isMobile = useIsMobile();
   const requestOptions = {
     method: 'POST',
     headers: {
@@ -40,7 +43,17 @@ export default function App() {
             ? <Button className={styles.logout} onClick={handleClick} variant='outlined'>Logout</Button>
             : <CreateAccountModal></CreateAccountModal>
           }
-          <main className={styles.main}>
+          <Box sx={{
+            margin: 'auto',
+            minHeight: '80vh',
+            mt: 2,
+            width: isMobile ? '100%' : '60%',
+            color: 'aliceblue',
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            flexDirection: 'column',
+          }}>
 
             <Routes>
               <Route path='/' element={
@@ -54,7 +67,7 @@ export default function App() {
                 </ProtectedRoute>
               } />
             </Routes>
-          </main>
+          </Box>
         </SnackbarProvider>
       </Provider>
     </ApiProvider>

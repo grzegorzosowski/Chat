@@ -25,7 +25,7 @@ export default function InputPassword({ text, id, onChange, name, }: InputePassw
         event.preventDefault();
     };
     return (
-        <FormControl sx={{ width: 1, mb: '10px'}} size="small" variant="outlined" id={id}>
+        <FormControl sx={{ width: 1, mb: '10px' }} size="small" variant="outlined" id={id}>
             <InputLabel htmlFor="outlined-adornment-password" id={id}>
                 {text}
             </InputLabel>
@@ -47,7 +47,7 @@ export default function InputPassword({ text, id, onChange, name, }: InputePassw
                 }
                 label={text}
                 name={name}
-                
+
             />
         </FormControl>
     );

@@ -4,6 +4,7 @@ import { useSnackbar } from 'notistack';
 import { TextField } from '@mui/material';
 import InputPassword from '../InputPassword/InputPassword';
 import Button from '@mui/material/Button'
+import { useIsMobile } from '../../features/useIsMobile';
 
 interface FormState {
   userEmail: string;
@@ -13,6 +14,7 @@ interface FormState {
 export default function LoginPage() {
   const [form, setForm] = useState<FormState>({ userEmail: '', userPassword: '' });
   const { enqueueSnackbar } = useSnackbar();
+  const isMobile = useIsMobile();
   const requestOptions = {
     method: 'POST',
     headers: {
@@ -48,11 +50,10 @@ export default function LoginPage() {
   return (
     <Box
       sx={{
-        width: 1,
-        maxWidth: '40%',
+        width: isMobile ? '90%' : '40%',
         margin: 'auto',
         bgcolor: 'white',
-        padding: 3,
+        padding: 2,
         borderRadius: 2,
       }}
     >

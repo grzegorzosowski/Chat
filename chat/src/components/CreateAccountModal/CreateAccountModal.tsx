@@ -9,6 +9,7 @@ import InputPassword from '../InputPassword/InputPassword';
 import { useCreateAccountMutation } from '../../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
 import PassValidator from '../PassValidator/passValidator';
+import { useIsMobile } from '../../features/useIsMobile';
 interface FormState {
     userEmail: string;
     userNick: string;
@@ -22,6 +23,7 @@ export function CreateAccountModal() {
     const [validationDone, setValidationDone] = useState(false);
     const { enqueueSnackbar } = useSnackbar();
     const [createAccountFetch] = useCreateAccountMutation();
+    const isMobile = useIsMobile();
     const handleOpen = () => {
         setForm({ userEmail: '', userNick: '', userPassword: '', userPasswordRepeat: '' });
         setOpen(true);
@@ -73,47 +75,56 @@ export function CreateAccountModal() {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box className={styles.modalStyle}>
-                    <>
-                        <Box component='form' onSubmit={handleSubmit} className={styles.form}>
-                            <TextField
-                                className={styles.input}
-                                value={form.userEmail}
-                                onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
-                                label="Email"
-                                type="email"
-                                size="small"
-                            ></TextField>
-                            <TextField
-                                className={styles.input}
-                                value={form.userNick}
-                                onChange={(event) => setForm({ ...form, userNick: event.target.value })}
-                                label="Nick"
-                                type="text"
-                                size="small"
-                            ></TextField>
-                            <InputPassword
-                                value={form.userPassword}
-                                onChange={(event) => setForm({ ...form, userPassword: event.target.value })}
-                                text={'Password'}
-                            ></InputPassword>
-                            <InputPassword
-                                value={form.userPasswordRepeat}
-                                onChange={(event) => setForm({ ...form, userPasswordRepeat: event.target.value })}
-                                text={'Password'}
-                            ></InputPassword>
-                            <PassValidator password={form.userPassword} passwordCorrect={setValidationDone}></PassValidator>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                                sx={{ px: 5, mt: 1 }}
-                            >
-                                CREATE
-                            </Button>
-                        </Box>
-                    </>
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: `translate(-50%, -50%)`,
+                    width: isMobile ? '90%' : '20%',
+                    backgroundColor: 'white',
+                    border: '2px solid #000',
+                    boxShadow: '24px',
+                    padding: '10px',
+                    borderRadius: '5px',
+                }}>
+                    <Box component='form' onSubmit={handleSubmit} className={styles.form}>
+                        <TextField
+                            className={styles.input}
+                            value={form.userEmail}
+                            onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
+                            label="Email"
+                            type="email"
+                            size="small"
+                        ></TextField>
+                        <TextField
+                            className={styles.input}
+                            value={form.userNick}
+                            onChange={(event) => setForm({ ...form, userNick: event.target.value })}
+                            label="Nick"
+                            type="text"
+                            size="small"
+                        ></TextField>
+                        <InputPassword
+                            value={form.userPassword}
+                            onChange={(event) => setForm({ ...form, userPassword: event.target.value })}
+                            text={'Password'}
+                        ></InputPassword>
+                        <InputPassword
+                            value={form.userPasswordRepeat}
+                            onChange={(event) => setForm({ ...form, userPasswordRepeat: event.target.value })}
+                            text={'Password'}
+                        ></InputPassword>
+                        <PassValidator password={form.userPassword} passwordCorrect={setValidationDone}></PassValidator>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            sx={{ px: 5, mt: 1 }}
+                        >
+                            CREATE
+                        </Button>
+                    </Box>
                 </Box>
 
             </Modal >
