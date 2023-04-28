@@ -10,6 +10,7 @@ import { useCreateAccountMutation } from '../../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
 import PassValidator from '../PassValidator/passValidator';
 import { useIsMobile } from '../../features/useIsMobile';
+import MobileCloseButton from '../MobileView/MobileCloseButton';
 interface FormState {
     userEmail: string;
     userNick: string;
@@ -87,6 +88,7 @@ export function CreateAccountModal() {
                     padding: '10px',
                     borderRadius: '5px',
                 }}>
+                    {isMobile && <MobileCloseButton handleClose={setOpen}></MobileCloseButton>}
                     <Box component='form' onSubmit={handleSubmit} className={styles.form}>
                         <TextField
                             className={styles.input}

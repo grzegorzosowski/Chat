@@ -11,6 +11,8 @@ import { useEffect, useState } from 'react';
 import { Link } from '@mui/material';
 import { useCreateChatMutation } from '../../features/api/apiSlice';
 import { enqueueSnackbar } from 'notistack';
+import { useIsMobile } from '../../features/useIsMobile';
+import MobileCloseButton from '../MobileView/MobileCloseButton';
 
 interface User {
     _id: string;
@@ -23,6 +25,7 @@ interface UsersList {
 }
 
 export default function CreateChatModal() {
+    const isMobile = useIsMobile();
     const user = useUser();
     const [open, setOpen] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
@@ -98,27 +101,69 @@ export default function CreateChatModal() {
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box className={styles.modalStyle}>
-                    <Typography variant='h6' className={styles.title} >CREATE GROUP CHAT</Typography>
-                    <Box value={newChatName} component='input' placeholder='Chat name' className={styles.inputStyle} onChange={(event) => setNewChatName(event.target.value)} />
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: isMobile ? '80%' : '400px',
+                    backgroundColor: 'white',
+                    border: '2px solid #000',
+                    boxShadow: '24px',
+                    padding: '20px',
+                    borderRadius: '5px',
+                }}>
+                    <MobileCloseButton handleClose={handleClose}></MobileCloseButton>
+                    <Typography variant='h6' sx={{
+                        textAlign: 'center',
+                        marginBottom: '20px',
+                    }}>CREATE GROUP CHAT</Typography>
+                    <Box
+                        value={newChatName}
+                        component='input'
+                        placeholder='Chat name'
+                        onChange={(event) => setNewChatName(event.target.value)}
+                        sx={{
+                            width: '100%',
+                            height: '30px',
+                            border: '1px solid #000',
+                            borderRadius: '5px',
+                            padding: '5px',
+                            marginBottom: '10px',
+                            boxSizing: 'border-box',
+                        }} />
                     <Typography id="modal-modal-description">
                         Add users to chat:
                     </Typography>
 
-                    <Box className={styles.userList}>
-                        {users.length > 0 ?
-                            <>{usersFetched && users && users.map((user: User) =>
-                                <Link key={user._id} className={styles.checkUserLink} onClick={() => handleClick(user)}>
-                                    {newChatUsers.includes(user)
-                                        ? <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
-                                        : <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
-                                    }
-                                </Link>
-                            )
-                            }</>
-                            : <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                                <Typography >There is no another users</Typography>
-                            </Box>
+                    <Box sx={{
+                        height: '150px',
+                        overflowY: 'scroll',
+                        border: '1px solid rgba(50, 50, 50, 0.8)',
+                        borderRadius: '5px',
+                        '&::-webkit-scrollbar': {
+                            width: '8px',
+                            backgroundColor: 'white',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: '#1976d2',
+                            borderRadius: '5px',
+                        },
+                    }} >
+                        {
+                            users.length > 0 ?
+                                <>{usersFetched && users && users.map((user: User) =>
+                                    <Link key={user._id} className={styles.checkUserLink} onClick={() => handleClick(user)}>
+                                        {newChatUsers.includes(user)
+                                            ? <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                            : <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                        }
+                                    </Link>
+                                )
+                                }</>
+                                : <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Typography >There is no another users</Typography>
+                                </Box>
                         }
                     </Box>
                     <Button
@@ -130,7 +175,7 @@ export default function CreateChatModal() {
                         onClick={handleSubmit}>CREATE</Button>
                 </Box>
 
-            </Modal>
-        </Box>
+            </Modal >
+        </Box >
     );
 }

@@ -40,13 +40,13 @@ export default function App() {
       <Provider store={store}>
         <SnackbarProvider maxSnack={3} autoHideDuration={3000} >
           {isUser
-            ? <Button className={styles.logout} onClick={handleClick} variant='outlined'>Logout</Button>
+            ? <Button onClick={handleClick} variant='outlined' color='error' className={styles.logout}>Logout</Button>
             : <CreateAccountModal></CreateAccountModal>
           }
           <Box sx={{
             margin: 'auto',
             minHeight: '80vh',
-            mt: 2,
+            mt: 3,
             width: isMobile ? '100%' : '60%',
             color: 'aliceblue',
             display: 'flex',
