@@ -11,6 +11,7 @@ import { store } from './store';
 import { apiSlice } from './features/api/apiSlice';
 import { ApiProvider } from '@reduxjs/toolkit/dist/query/react';
 import { CreateAccountModal } from './components/CreateAccountModal/CreateAccountModal';
+import ErrorPage from './components/ErrorPage/ErrorPage';
 import { useIsMobile } from './features/useIsMobile';
 
 export default function App() {
@@ -65,6 +66,9 @@ export default function App() {
                 <ProtectedRoute isUser={isUser}>
                   <ChatPage />
                 </ProtectedRoute>
+              } />
+              <Route path='*' element={
+                <ErrorPage />
               } />
             </Routes>
           </Box>
