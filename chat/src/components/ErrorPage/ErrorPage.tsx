@@ -22,7 +22,6 @@ export default function ErrorPage() {
                     sx={{
                         fontSize: '1.5rem',
                         color: '#1976d2',
-
                     }}>Go back to home page</Link>
             </Box>
         </Box>

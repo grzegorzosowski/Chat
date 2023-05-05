@@ -72,60 +72,69 @@ export default function ChatWindow(): JSX.Element {
   }
   return (
     <>
-      <Box ref={containerRef} sx={{
-        position: 'relative',
-        backgroundColor: 'aliceblue',
-        opacity: '0.8',
-        color: 'black',
-        height: '100%',
-        width: '100%',
-        padding: '1rem',
-        boxSizing: 'border-box',
-        borderRadius: '10px',
-        display: 'flex',
-        flexDirection: 'column',
-        flexFlow: 'column nowrap',
-        overflowY: 'auto',
-        "& :first-child": {
-          marginTop: 'auto !important',
-        },
-        "::-webkit-scrollbar": {
-          width: '8px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '0 10px 10px 0',
-        },
-        "::-webkit-scrollbar-thumb": {
-          backgroundColor: 'gray',
-          borderRadius: '4px',
-        }
-      }}>
-        {gettingChat ? <Loader /> :
-          <>
-            {activeChat.chatID !== '1' && message.map(mess =>
-              <Tooltip
-                key={mess.messageID}
-                title={userNick !== '' &&
-                  <>
-                    <Typography variant="caption" sx={{ display: 'block' }}>{userNick}</Typography>
-                    <Typography variant="caption" >{mess.timestamp.toString()}</Typography>
-                  </>
-                }
-                onOpen={() => void onTooltipOpen(mess.senderID)}>
-                {mess.senderID === user?._id ?
-                  <Box className={styles.myMessage}>{mess.message}</Box> :
-                  <Box className={styles.othersMessage}>{mess.message}</Box>
-                }
-              </Tooltip>)}
-          </>
-        }
-      </Box >
+      {gettingChat ? <Loader /> :
+        <Box ref={containerRef} sx={{
+          position: 'relative',
+          backgroundColor: 'aliceblue',
+          opacity: '0.8',
+          color: 'black',
+          height: '100%',
+          width: '100%',
+          padding: '1rem',
+          boxSizing: 'border-box',
+          borderRadius: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          flexFlow: 'column nowrap',
+          overflowY: 'auto',
+          "& :first-child": {
+            marginTop: 'auto !important',
+          },
+          "::-webkit-scrollbar": {
+            width: '8px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '0 10px 10px 0',
+          },
+          "::-webkit-scrollbar-thumb": {
+            backgroundColor: 'gray',
+            borderRadius: '4px',
+          }
+        }}>
+          {activeChat.chatID !== '1' && message.map(mess =>
+            <Tooltip
+              key={mess.messageID}
+              title={userNick !== '' &&
+                <>
+                  <Typography variant="caption" sx={{ display: 'block' }}>{userNick}</Typography>
+                  <Typography variant="caption" >{mess.timestamp.toString()}</Typography>
+                </>
+              }
+              onOpen={() => void onTooltipOpen(mess.senderID)}>
+              {mess.senderID === user?._id ?
+                <Box className={styles.myMessage}>{mess.message}</Box> :
+                <Box className={styles.othersMessage}>{mess.message}</Box>
+              }
+            </Tooltip>)}
+        </Box>
+      }
     </>
   )
 }
 
 const Loader = () => {
   return (
-    <Box sx={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <Box sx={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      justifyContent: 'center ',
+      alignItems: 'center',
+      backgroundColor: 'aliceblue',
+      opacity: '0.8',
+      borderRadius: '10px',
+    }}>
       <CircularProgress size={50} />
     </Box>
   )

@@ -10,13 +10,13 @@ import MobileCloseButton from './MobileCloseButton'
 import MobileModal from './MobileModal'
 
 export default function MobileView() {
-    const [openUsers, setUsers] = React.useState(false);
-    const [openOptions, setOptions] = React.useState(false);
+    const [openUsers, setOpenUsers] = React.useState(false);
+    const [openOptions, setOpenOptions] = React.useState(false);
     const isMobile = useIsMobile();
-    const handleOpen = () => setUsers(true);
-    const handleClose = () => setUsers(false);
-    const handleOpenOptions = () => setOptions(true);
-    const handleCloseOptions = () => setOptions(false);
+    const handleOpen = () => setOpenUsers(true);
+    const handleClose = () => setOpenUsers(false);
+    const handleOpenOptions = () => setOpenOptions(true);
+    const handleCloseOptions = () => setOpenOptions(false);
     return (
         <>
             <Box sx={{
@@ -27,7 +27,7 @@ export default function MobileView() {
             }}>
                 <Button onClick={handleOpen} variant='outlined'>Chats</Button>
                 <MobileModal open={openUsers} handleClose={handleClose}>
-                    <MobileCloseButton handleClose={setUsers}></MobileCloseButton>
+                    <MobileCloseButton handleClose={setOpenUsers}></MobileCloseButton>
                     <UserList></UserList>
                 </MobileModal>
             </Box>
@@ -38,7 +38,7 @@ export default function MobileView() {
             }}>
                 <Button onClick={handleOpenOptions} variant='outlined'>Options</Button>
                 <MobileModal open={openOptions} handleClose={handleCloseOptions}>
-                    <MobileCloseButton handleClose={setOptions}></MobileCloseButton>
+                    <MobileCloseButton handleClose={setOpenOptions}></MobileCloseButton>
                     <ChatOption></ChatOption>
                 </MobileModal>
             </Box>
