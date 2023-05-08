@@ -3,23 +3,20 @@ import UserList from '../../components/UserList/UserList'
 import ChatWindow from '../../components/ChatWindow/ChatWindow'
 import ChatOption from '../../components/ChatOption/ChatOption'
 import MessageBox from '../../components/MessageBox/MessageBox'
-import { Box, Button, Modal } from '@mui/material'
-import { useIsMobile } from '../../features/useIsMobile'
-import CloseIcon from '@mui/icons-material/Close';
+import { Box, Button } from '@mui/material'
 import MobileCloseButton from './MobileCloseButton'
 import MobileModal from './MobileModal'
 
 export default function MobileView() {
     const [openUsers, setOpenUsers] = React.useState(false);
     const [openOptions, setOpenOptions] = React.useState(false);
-    const isMobile = useIsMobile();
     const handleOpen = () => setOpenUsers(true);
     const handleClose = () => setOpenUsers(false);
     const handleOpenOptions = () => setOpenOptions(true);
     const handleCloseOptions = () => setOpenOptions(false);
     return (
         <>
-            <Box sx={{
+            <Box data-testid='test-UserList' sx={{
                 position: 'fixed',
                 top: '10px',
                 left: 'auto',
@@ -31,14 +28,14 @@ export default function MobileView() {
                     <UserList></UserList>
                 </MobileModal>
             </Box>
-            <Box sx={{
+            <Box data-testid='test-ChatOption' sx={{
                 position: 'fixed',
                 top: '10px',
                 right: '10px',
             }}>
                 <Button onClick={handleOpenOptions} variant='outlined'>Options</Button>
                 <MobileModal open={openOptions} handleClose={handleCloseOptions}>
-                    <MobileCloseButton handleClose={setOpenOptions}></MobileCloseButton>
+                    <MobileCloseButton data-testid='test-MobileCloseButton' handleClose={setOpenOptions}></MobileCloseButton>
                     <ChatOption></ChatOption>
                 </MobileModal>
             </Box>
@@ -52,17 +49,19 @@ export default function MobileView() {
                 height: '80vh',
                 width: '95%',
             }}>
-                <Box sx={{
-                    height: '80%',
-                    width: '100%',
-                }}>
-                    <ChatWindow></ChatWindow>
+                <Box
+                    sx={{
+                        height: '80%',
+                        width: '100%',
+                    }}>
+                    <ChatWindow data-testid='test-ChatWindow'></ChatWindow>
                 </Box>
-                <Box sx={{
-                    width: '100%',
-                    height: '20%',
-                }}>
-                    <MessageBox></MessageBox>
+                <Box
+                    sx={{
+                        width: '100%',
+                        height: '20%',
+                    }}>
+                    <MessageBox data-testid='test-MessageBox'></MessageBox>
                 </Box>
             </Box>
         </>

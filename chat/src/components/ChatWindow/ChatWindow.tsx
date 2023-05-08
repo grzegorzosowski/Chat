@@ -89,7 +89,7 @@ export default function ChatWindow(): JSX.Element {
           flexDirection: 'column',
           flexFlow: 'column nowrap',
           overflowY: 'auto',
-          "& :first-child": {
+          "& :first-of-type": {
             marginTop: 'auto !important',
           },
           "::-webkit-scrollbar": {
