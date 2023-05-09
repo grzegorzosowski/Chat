@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { webSocket } from '../../webSocketConfig'
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { addMessage } from '../../features/messages/messagesSlice';
-import { useUser } from '../../UserProvider';
+import { webSocket } from '../webSocketConfig'
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { addMessage } from '../features/messages/messagesSlice';
+import { useUser } from '../UserProvider';
 import { Box } from '@mui/material';
 
 

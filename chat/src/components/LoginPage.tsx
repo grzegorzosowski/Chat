@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import { useSnackbar } from 'notistack';
 import { TextField } from '@mui/material';
-import InputPassword from '../InputPassword/InputPassword';
+import InputPassword from './InputPassword';
 import Button from '@mui/material/Button'
-import { useIsMobile } from '../../features/useIsMobile';
+import { useIsMobile } from '../features/useIsMobile';
 
 interface FormState {
   userEmail: string;
@@ -57,7 +57,7 @@ export default function LoginPage() {
         borderRadius: 2,
       }}
     >
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column' }}>
+      <Box component="form" data-testid="loginForm" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column' }}>
         <TextField
           value={form.userEmail}
           onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
@@ -68,6 +68,7 @@ export default function LoginPage() {
         ></TextField>
         <InputPassword
           value={form.userPassword}
+          data-testid="password"
           onChange={(event) => setForm({ ...form, userPassword: event.target.value })}
           text={'Password'}
         ></InputPassword>

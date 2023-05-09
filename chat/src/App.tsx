@@ -1,16 +1,16 @@
 import { Routes, Route } from 'react-router-dom'
-import ChatPage from './components/ChatPage/ChatPage';
-import LoginPage from './components/LoginPage/LoginPage';
+import ChatPage from './components/ChatPage';
+import LoginPage from './components/LoginPage';
 import styles from './styles/Home.module.css'
 import { useUser } from './UserProvider';
-import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { SnackbarProvider } from 'notistack';
 import { Box, Button } from '@mui/material';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { apiSlice } from './features/api/apiSlice';
 import { ApiProvider } from '@reduxjs/toolkit/dist/query/react';
-import { CreateAccountModal } from './components/CreateAccountModal/CreateAccountModal';
+import { CreateAccountModal } from './components/CreateAccountModal';
 import ErrorPage from './components/ErrorPage/ErrorPage';
 import { useIsMobile } from './features/useIsMobile';
 

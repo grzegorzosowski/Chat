@@ -4,15 +4,15 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import styles from '../../styles/CreateChatModal.module.css'
-import buttonStyle from '../../styles/ChatOption.module.css'
-import { useUser } from '../../UserProvider';
+import styles from '../styles/CreateChatModal.module.css'
+import buttonStyle from '../styles/ChatOption.module.css'
+import { useUser } from '../UserProvider';
 import { useEffect, useState } from 'react';
 import { Link } from '@mui/material';
-import { useCreateChatMutation } from '../../features/api/apiSlice';
+import { useCreateChatMutation } from '../features/api/apiSlice';
 import { enqueueSnackbar } from 'notistack';
-import { useIsMobile } from '../../features/useIsMobile';
-import MobileCloseButton from '../MobileView/MobileCloseButton';
+import { useIsMobile } from '../features/useIsMobile';
+import MobileCloseButton from './MobileView/MobileCloseButton';
 
 interface User {
     _id: string;

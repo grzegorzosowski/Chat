@@ -1,14 +1,14 @@
 import Box from '@mui/material/Box';
 import { useEffect, useState } from 'react'
-import { useUser } from '../../UserProvider';
-import User from '../User/User'
-import styles from '../../styles/UserList.module.css'
+import { useUser } from '../UserProvider';
+import User from './User'
+import styles from '../styles/UserList.module.css'
 import Link from '@mui/material/Link';
-import { useAppDispatch } from '../../hooks';
-import { setActiveChat, setGettingChat } from '../../features/chats/chatsSlice';
-import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation } from '../../features/api/apiSlice';
-import { putMessages } from '../../features/messages/messagesSlice';
-import GroupChat from '../GroupChat/GroupChat';
+import { useAppDispatch } from '../hooks';
+import { setActiveChat, setGettingChat } from '../features/chats/chatsSlice';
+import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation } from '../features/api/apiSlice';
+import { putMessages } from '../features/messages/messagesSlice';
+import GroupChat from './GroupChat';
 import { Tooltip, Typography } from '@mui/material';
 interface User {
   _id: string;

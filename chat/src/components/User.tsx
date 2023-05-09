@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box'
-import styles from '../../styles/User.module.css'
-import { useAppSelector } from '../../hooks'
+import styles from '../styles/User.module.css'
+import { useAppSelector } from '../hooks'
 
 interface UserProps {
     user: {

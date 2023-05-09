@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-import passwordValidation from '../../features/passwordValidation/passwordValidation';
+import passwordValidation from '../features/passwordValidation/passwordValidation';
 
 type PassValidatorProps = {
   password: string;

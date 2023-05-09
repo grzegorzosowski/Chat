@@ -1,12 +1,12 @@
 import { Box, Tooltip, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react'
-import { webSocket } from '../../webSocketConfig'
-import { useAppSelector, useAppDispatch } from '../../hooks';
-import styles from '../../styles/ChatWindow.module.css'
-import { useUser } from '../../UserProvider';
-import { addMessage } from '../../features/messages/messagesSlice';
+import { webSocket } from '../webSocketConfig'
+import { useAppSelector, useAppDispatch } from '../hooks';
+import styles from '../styles/ChatWindow.module.css'
+import { useUser } from '../UserProvider';
+import { addMessage } from '../features/messages/messagesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useGetUserNickMutation } from '../../features/api/apiSlice';
+import { useGetUserNickMutation } from '../features/api/apiSlice';
 
 
 interface MessageData {

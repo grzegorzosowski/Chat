@@ -2,15 +2,15 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import styles from '../../styles/CreateAccountModal.module.css'
-import buttonStyle from '../../styles/ChatOption.module.css'
+import styles from '../styles/CreateAccountModal.module.css'
+import buttonStyle from '../styles/ChatOption.module.css'
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import { useChangeAccountNickMutation } from '../../features/api/apiSlice';
+import { useChangeAccountNickMutation } from '../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
-import { useUser } from '../../UserProvider';
-import { useIsMobile } from '../../features/useIsMobile';
-import MobileCloseButton from '../MobileView/MobileCloseButton';
+import { useUser } from '../UserProvider';
+import { useIsMobile } from '../features/useIsMobile';
+import MobileCloseButton from './MobileView/MobileCloseButton';
 
 export function ChangeAccountParam() {
     const user = useUser();

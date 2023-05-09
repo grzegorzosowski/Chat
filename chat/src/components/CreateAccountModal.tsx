@@ -2,15 +2,15 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import styles from '../../styles/CreateAccountModal.module.css'
+import styles from '../styles/CreateAccountModal.module.css'
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import InputPassword from '../InputPassword/InputPassword';
-import { useCreateAccountMutation } from '../../features/api/apiSlice';
+import InputPassword from './InputPassword';
+import { useCreateAccountMutation } from '../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
-import PassValidator from '../PassValidator/passValidator';
-import { useIsMobile } from '../../features/useIsMobile';
-import MobileCloseButton from '../MobileView/MobileCloseButton';
+import PassValidator from './passValidator';
+import { useIsMobile } from '../features/useIsMobile';
+import MobileCloseButton from './MobileView/MobileCloseButton';
 interface FormState {
     userEmail: string;
     userNick: string;
