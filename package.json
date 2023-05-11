@@ -5,6 +5,7 @@
     "start:backend": "cd chatServer && npm install && npx nodemon"
   },
   "devDependencies": {
-    "concurrently": "^8.0.1"
+    "concurrently": "^8.0.1",
+    "jest-fetch-mock": "^3.0.3"
   }
 }
