@@ -13,9 +13,10 @@ interface InputePasswordProps {
     onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> | undefined
     name?: string
     value?: string
+    label?: string
 }
 
-export default function InputPassword({ text, id, onChange, name }: InputePasswordProps) {
+export default function InputPassword({ text, id, onChange, name, label }: InputePasswordProps) {
     const [showPassword, setShowPassword] = React.useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -25,12 +26,14 @@ export default function InputPassword({ text, id, onChange, name }: InputePasswo
     };
     return (
         <FormControl sx={{ width: 1, mb: '10px' }} size="small" variant="outlined" id={id}
-            data-testid="password">
+        >
             <InputLabel htmlFor="outlined-adornment-password" id={id}  >
                 {text}
             </InputLabel>
             <OutlinedInput
-                id={id}
+                id="outlined-adornment-password"
+                aria-label='password'
+                data-testid="password"
                 type={showPassword ? 'text' : 'password'}
                 onChange={onChange}
                 endAdornment={

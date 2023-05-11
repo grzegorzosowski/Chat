@@ -12,77 +12,83 @@ interface FormState {
 }
 
 export default function LoginPage() {
-  const [form, setForm] = useState<FormState>({ userEmail: '', userPassword: '' });
   const { enqueueSnackbar } = useSnackbar();
-  const isMobile = useIsMobile();
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      username: form.userEmail,
-      password: form.userPassword,
-    }),
-  };
-  const logUser = async () => {
-    try {
-      const res = await fetch('api/login/password', requestOptions);
-      const success = res.status === 200;
-      if (success) {
-        await fetch('api/user', { method: 'GET' });
-        window.location.replace('/chat');
-      } else {
-        enqueueSnackbar('Wrong password', { variant: 'error' });
+
+  const handleSubmit = (email: string, password: string) => {
+    const send = async () => {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+        }),
+      };
+
+      try {
+        const res = await fetch('api/login/password', requestOptions);
+        const success = res.status === 200;
+        if (success) {
+          await fetch('api/user', { method: 'GET' });
+          window.location.replace('/chat');
+        } else {
+          enqueueSnackbar('Wrong password', { variant: 'error' });
+        }
+      } catch (error) {
+        console.log('Some error during logging');
+        console.error(error);
       }
-    } catch (error) {
-      console.log('Some error during logging');
-      console.error(error);
     }
+    send().catch(e => console.warn(e))
   };
 
-  const handleSubmit = (e: React.FormEvent<Element>) => {
-    e.preventDefault();
-    console.log('Button wcisniety')
-    void logUser();
-  };
-
-  return (
-    <Box
-      sx={{
-        width: isMobile ? '90%' : '40%',
-        margin: 'auto',
-        bgcolor: 'white',
-        padding: 2,
-        borderRadius: 2,
-      }}
-    >
-      <Box component="form" data-testid="loginForm" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column' }}>
-        <TextField
-          value={form.userEmail}
-          onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
-          label="Email"
-          type="email"
-          size="small"
-          sx={{ mb: 2 }}
-        ></TextField>
-        <InputPassword
-          value={form.userPassword}
-          data-testid="password"
-          onChange={(event) => setForm({ ...form, userPassword: event.target.value })}
-          text={'Password'}
-        ></InputPassword>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
-          sx={{ px: 5, mt: 3 }}
-        >
-          Login
-        </Button>
-      </Box>
-    </Box>
-  )
+  return <LoginForm handleSubmit={handleSubmit} />
 }
 
+export function LoginForm({ handleSubmit }: { handleSubmit: (email: string, password: string) => void }) {
+  const [form, setForm] = useState<FormState>({ userEmail: '', userPassword: '' });
+  const isMobile = useIsMobile();
+
+  return <Box
+    sx={{
+      width: isMobile ? '90%' : '40%',
+      margin: 'auto',
+      bgcolor: 'white',
+      padding: 2,
+      borderRadius: 2,
+    }}
+  >
+    <Box component="form" data-testid="loginForm" onSubmit={(e) => {
+      e.preventDefault()
+      handleSubmit(form.userEmail, form.userPassword)
+    }} sx={{ display: 'flex', flexDirection: 'column' }}>
+      <TextField
+        value={form.userEmail}
+        onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
+        label="Email"
+        type="email"
+        size="small"
+        sx={{ mb: 2 }}
+      />
+      <InputPassword
+        value={form.userPassword}
+        label="Password"
+        data-testid="password"
+        onChange={(event) => setForm({ ...form, userPassword: event.target.value })}
+        text={'Password'}
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        size="large"
+        sx={{ px: 5, mt: 3 }}
+        disabled={form.userEmail === "" || form.userPassword === ""}
+      >
+        Login
+      </Button>
+    </Box>
+  </Box>
+}
