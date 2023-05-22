@@ -4,7 +4,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
@@ -20,6 +19,278 @@ import { CreateAccountModal } from './CreateAccountModal';
 import { useCurrentTheme } from '../features/currentThemeProvider';
 import { LightMode } from '@mui/icons-material';
 import ModeNightIcon from '@mui/icons-material/ModeNight';
+import CreateChatModal from './CreateChatModal';
+import { useIsMobile } from '../features/useIsMobile';
+import { Button } from '@mui/material';
+import { setActiveChat } from '../features/chats/chatsSlice';
+import { useAppDispatch } from '../hooks';
+import { ChangeAccountParam } from './ChangeNick';
+
+
+
+
+const requestOptions = {
+    method: 'POST',
+    headers: {
+        'Content-type': 'application/json',
+    },
+    body: JSON.stringify({
+    }),
+}
+
+const handleClick = () => {
+    void fetchData();
+}
+
+const fetchData = async () => {
+    await fetch('api/logout', requestOptions)
+    console.log("Button pushed")
+    window.location.replace('/');
+}
+
+
+export default function PrimarySearchAppBar() {
+    const isUser = useUser();
+    const isMobile = useIsMobile();
+    const dispatch = useAppDispatch();
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+        React.useState<null | HTMLElement>(null);
+    const [leftMenuAnchorEl, setLeftMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+
+    const isLeftMenuOpen = Boolean(leftMenuAnchorEl);
+    const isMenuOpen = Boolean(anchorEl);
+    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMobileMenuClose = () => {
+        setMobileMoreAnchorEl(null);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        handleMobileMenuClose();
+    };
+
+    const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setMobileMoreAnchorEl(event.currentTarget);
+    };
+
+    const handleLeftMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setLeftMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleLeftMenuClose = () => {
+        setLeftMenuAnchorEl(null);
+    };
+
+    const handleSelectChat = () => {
+        dispatch(setActiveChat({ chatID: '1', chatName: 'Select chat', members: [] }))
+        handleLeftMenuClose();
+    }
+
+    const handleProfile = () => {
+        handleMenuClose();
+        window.location.replace('/profile');
+    }
+
+    const leftMenuItems = [
+        { id: '1', name: 'Create group chat', component: <CreateChatModal closeLeftMenu={handleLeftMenuClose} /> },
+    ]
+
+
+
+    const menuId = 'primary-search-account-menu';
+    const renderMenu = (
+        <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={{
+                vertical: 56,
+                horizontal: 'right',
+            }}
+            id={menuId}
+            keepMounted
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+        >
+            <MenuItem onClick={handleProfile}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem onClick={handleClick}>Logout</MenuItem>
+        </Menu>
+    );
+
+    const mobileMenuId = 'primary-search-account-menu-mobile';
+    const renderMobileMenu = (
+        <Menu
+            anchorEl={mobileMoreAnchorEl}
+            anchorOrigin={{
+                vertical: 52,
+                horizontal: 'right',
+            }}
+            id={mobileMenuId}
+            keepMounted
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            open={isMobileMenuOpen}
+            onClose={handleMobileMenuClose}
+        >
+            <MenuItem>
+                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                    <Badge badgeContent={4} color="error">
+                        <MailIcon />
+                    </Badge>
+                </IconButton>
+                <p>Messages</p>
+            </MenuItem>
+            <MenuItem>
+                <IconButton
+                    size="large"
+                    aria-label="show 17 new notifications"
+                    color="inherit"
+                >
+                    <Badge badgeContent={12} color="error">
+                        <NotificationsIcon />
+                    </Badge>
+                </IconButton>
+                <p>Notifications</p>
+            </MenuItem>
+            <MenuItem onClick={handleProfileMenuOpen}>
+                <IconButton
+                    size="large"
+                    aria-label="account of current user"
+                    aria-controls="primary-search-account-menu"
+                    aria-haspopup="true"
+                    color="inherit"
+                >
+                    <AccountCircle />
+                </IconButton>
+                <p>Profile</p>
+            </MenuItem>
+        </Menu>
+    );
+    const leftMenuId = 'primary-search-account-menu-left';
+    const leftMenu = (
+        <Menu
+            anchorEl={leftMenuAnchorEl}
+            anchorOrigin={{
+                vertical: isMobile ? 52 : 56,
+                horizontal: 'left',
+            }}
+            id={leftMenuId}
+            keepMounted
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+            }}
+            open={isLeftMenuOpen}
+            onClose={handleLeftMenuClose}
+            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+        >
+            {isMobile && <Button onClick={handleSelectChat} sx={{ width: '100%', justifyContent: 'flex-start' }}>Select chat</Button>}
+            {leftMenuItems.map((item) => (
+                <Box key={item.id}>{item.component}</Box>))}
+        </Menu>
+    )
+
+
+
+    return (
+        <Box sx={{ flexGrow: 1 }}>
+            <AppBar position="static">
+                <Toolbar>
+                    {isUser ? <><IconButton
+                        size="large"
+                        edge="start"
+                        color="inherit"
+                        aria-label="open drawer"
+                        sx={{ mr: 1 }}
+                        onClick={handleLeftMenuOpen}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                        <Search>
+                            <SearchIconWrapper>
+                                <SearchIcon />
+                            </SearchIconWrapper>
+                            <StyledInputBase
+                                placeholder="Search…"
+                                inputProps={{ 'aria-label': 'search' }}
+                            />
+                        </Search>
+                        <ChangeThemeButton />
+                        <Box sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => window.location.replace('/chat')} > CHAT</Box>
+                        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                            <><IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                                <Badge badgeContent={4} color="error">
+                                    <MailIcon />
+                                </Badge>
+                            </IconButton>
+                                <IconButton
+                                    size="large"
+                                    aria-label="show 17 new notifications"
+                                    color="inherit"
+                                >
+                                    <Badge badgeContent={12} color="error">
+                                        <NotificationsIcon />
+                                    </Badge>
+                                </IconButton>
+                                <IconButton
+                                    size="large"
+                                    edge="end"
+                                    aria-label="account of current user"
+                                    aria-controls={menuId}
+                                    aria-haspopup="true"
+                                    onClick={handleProfileMenuOpen}
+                                    color="inherit"
+                                >
+                                    <AccountCircle />
+                                </IconButton> </>
+                        </Box>
+                        <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                            <IconButton
+                                size="large"
+                                aria-label="show more"
+                                aria-controls={mobileMenuId}
+                                aria-haspopup="true"
+                                onClick={handleMobileMenuOpen}
+                                color="inherit"
+                            >
+                                <MoreIcon />
+                            </IconButton>
+                        </Box> </> :
+                        <><ChangeThemeButton /> <CreateAccountModal /></>}
+                </Toolbar>
+            </AppBar>
+            {leftMenu}
+            {renderMobileMenu}
+            {renderMenu}
+        </Box>
+    );
+}
+
+function ChangeThemeButton() {
+    const currentTheme = useCurrentTheme();
+    return (
+        <IconButton
+            size="medium"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={() => currentTheme.setTheme(currentTheme.theme === 'light' ? 'dark' : 'light')}
+        >
+            {currentTheme.theme === 'dark' ? <ModeNightIcon /> : <LightMode />}
+        </IconButton>
+    );
+}
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -60,219 +331,3 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         },
     },
 }));
-
-const requestOptions = {
-    method: 'POST',
-    headers: {
-        'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-    }),
-}
-
-const handleClick = () => {
-    void fetchData();
-}
-
-const fetchData = async () => {
-    await fetch('api/logout', requestOptions)
-    console.log("Button pushed")
-    window.location.replace('/');
-}
-
-
-export default function PrimarySearchAppBar() {
-    const isUser = useUser();
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-        React.useState<null | HTMLElement>(null);
-
-    const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMobileMenuClose = () => {
-        setMobileMoreAnchorEl(null);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        handleMobileMenuClose();
-    };
-
-    const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setMobileMoreAnchorEl(event.currentTarget);
-    };
-
-    const menuId = 'primary-search-account-menu';
-    const renderMenu = (
-        <Menu
-            anchorEl={anchorEl}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            id={menuId}
-            keepMounted
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            open={isMenuOpen}
-            onClose={handleMenuClose}
-        >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-            <MenuItem onClick={handleClick}>Logout</MenuItem>
-        </Menu>
-    );
-
-    const mobileMenuId = 'primary-search-account-menu-mobile';
-    const renderMobileMenu = (
-        <Menu
-            anchorEl={mobileMoreAnchorEl}
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            id={mobileMenuId}
-            keepMounted
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-            open={isMobileMenuOpen}
-            onClose={handleMobileMenuClose}
-        >
-            <MenuItem>
-                <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                    <Badge badgeContent={4} color="error">
-                        <MailIcon />
-                    </Badge>
-                </IconButton>
-                <p>Messages</p>
-            </MenuItem>
-            <MenuItem>
-                <IconButton
-                    size="large"
-                    aria-label="show 17 new notifications"
-                    color="inherit"
-                >
-                    <Badge badgeContent={17} color="error">
-                        <NotificationsIcon />
-                    </Badge>
-                </IconButton>
-                <p>Notifications</p>
-            </MenuItem>
-            <MenuItem onClick={handleProfileMenuOpen}>
-                <IconButton
-                    size="large"
-                    aria-label="account of current user"
-                    aria-controls="primary-search-account-menu"
-                    aria-haspopup="true"
-                    color="inherit"
-                >
-                    <AccountCircle />
-                </IconButton>
-                <p>Profile</p>
-            </MenuItem>
-        </Menu>
-    );
-
-    return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        sx={{ mr: 2 }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
-                    >
-                        MUI
-                    </Typography>
-                    <Search>
-                        <SearchIconWrapper>
-                            <SearchIcon />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
-                    </Search>
-                    <ChangeThemeButton />
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                        {isUser ? <><IconButton size="large" aria-label="show 4 new mails" color="inherit">
-                            <Badge badgeContent={4} color="error">
-                                <MailIcon />
-                            </Badge>
-                        </IconButton>
-                            <IconButton
-                                size="large"
-                                aria-label="show 17 new notifications"
-                                color="inherit"
-                            >
-                                <Badge badgeContent={17} color="error">
-                                    <NotificationsIcon />
-                                </Badge>
-                            </IconButton>
-                            <IconButton
-                                size="large"
-                                edge="end"
-                                aria-label="account of current user"
-                                aria-controls={menuId}
-                                aria-haspopup="true"
-                                onClick={handleProfileMenuOpen}
-                                color="inherit"
-                            >
-                                <AccountCircle />
-                            </IconButton> </> :
-                            <CreateAccountModal />}
-                    </Box>
-                    <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-                        <IconButton
-                            size="large"
-                            aria-label="show more"
-                            aria-controls={mobileMenuId}
-                            aria-haspopup="true"
-                            onClick={handleMobileMenuOpen}
-                            color="inherit"
-                        >
-                            <MoreIcon />
-                        </IconButton>
-                    </Box>
-                </Toolbar>
-            </AppBar>
-            {renderMobileMenu}
-            {renderMenu}
-        </Box>
-    );
-}
-
-function ChangeThemeButton() {
-    const currentTheme = useCurrentTheme();
-    return (
-        <IconButton
-            size="medium"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={() => currentTheme.setTheme(currentTheme.theme === 'light' ? 'dark' : 'light')}
-        >
-            {currentTheme.theme === 'dark' ? <ModeNightIcon /> : <LightMode />}
-        </IconButton>
-    );
-}

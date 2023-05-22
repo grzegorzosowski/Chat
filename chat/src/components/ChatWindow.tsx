@@ -82,7 +82,7 @@ export default function ChatWindow(): JSX.Element {
           width: '100%',
           padding: '1rem',
           boxSizing: 'border-box',
-          borderRadius: '10px',
+          borderRadius: '10px 10px 0 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

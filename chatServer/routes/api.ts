@@ -15,9 +15,11 @@ router.get('/api/user', loggedIn, function (req: any, res, next) {
         _id: req.user?._id,
         nick: req.user?.nick,
         email: req.user?.email,
+        verified: req.user?.verified,
     };
     res.send(userToSend);
 });
+router.get('/api/email', UserController.emailToken);
 router.post('/api/getUsers', UserController.getUsers);
 router.post('/api/getUserNick', UserController.getUserNick);
 router.post('/api/createAccount', UserController.createUser);

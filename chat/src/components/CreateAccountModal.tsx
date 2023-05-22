@@ -11,6 +11,7 @@ import { useSnackbar } from 'notistack';
 import PassValidator from './passValidator';
 import { useIsMobile } from '../features/useIsMobile';
 import MobileCloseButton from './MobileView/MobileCloseButton';
+import { useTheme } from '@mui/material';
 interface FormState {
     userEmail: string;
     userNick: string;
@@ -19,6 +20,7 @@ interface FormState {
 }
 
 export function CreateAccountModal() {
+    const theme = useTheme();
     const [form, setForm] = useState<FormState>({ userEmail: '', userNick: '', userPassword: '', userPasswordRepeat: '' });
     const [open, setOpen] = useState(false);
     const [validationDone, setValidationDone] = useState(false);
@@ -42,12 +44,12 @@ export function CreateAccountModal() {
             .unwrap()
             .then((result) => {
                 console.log('Account created: ', result);
-                enqueueSnackbar('Account created', { variant: 'success' });
+                enqueueSnackbar('Account has been created', { variant: 'success' });
                 handleClose();
             })
             .catch((error) => {
-
                 console.log(error);
+                enqueueSnackbar('Account has not been created ', { variant: 'error' });
             })
     }
 
@@ -67,27 +69,34 @@ export function CreateAccountModal() {
     }
 
 
+
     return (
         <Box>
-            <Button onClick={handleOpen} variant='outlined' sx={{ position: 'fixed', left: '10px', top: '10px' }}>Create account</Button>
+            <Button
+                onClick={handleOpen}
+                variant='outlined'
+                sx={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary.contrastText,
+                    borderColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary.contrastText
+                }}>Create account</Button>
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={{
+                <Box sx={(theme) => ({
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
                     transform: `translate(-50%, -50%)`,
                     width: isMobile ? '90%' : '20%',
-                    backgroundColor: 'white',
                     border: '2px solid #000',
                     boxShadow: '24px',
                     padding: '10px',
                     borderRadius: '5px',
-                }}>
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(12, 12, 12, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                })}>
                     {isMobile && <MobileCloseButton handleClose={setOpen}></MobileCloseButton>}
                     <Box component='form' onSubmit={handleSubmit} className={styles.form}>
                         <TextField

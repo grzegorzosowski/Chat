@@ -1,21 +1,41 @@
 import UserList from './UserList'
 import ChatWindow from './ChatWindow'
-import ChatOption from './ChatOption'
 import MessageBox from './MessageBox'
-import styles from '../styles/Home.module.css'
 import { useIsMobile } from '../features/useIsMobile'
 import MobileView from './MobileView/MobileView'
+import { Box } from '@mui/material'
+import { FOOTER_HEIGHT } from './Footer'
 
 export default function ChatPage() {
     const isMobile = useIsMobile();
     return (
-        isMobile
-            ? <MobileView />
-            : <div className={styles.parent}>
-                <div className={styles.div1} ><UserList></UserList> </div>
-                <div className={styles.div2}><ChatWindow></ChatWindow></div>
-                <div className={styles.div3}><ChatOption></ChatOption></div>
-                <div className={[styles.div4, styles.border].join(' ')}><MessageBox></MessageBox></div>
-            </div>
+        <Box sx={{
+            display: 'flex',
+            height: `calc(100vh -  2 * ${FOOTER_HEIGHT}px)`,
+        }}>
+            {!isMobile && <Box sx={{
+                position: 'fixed',
+                left: '0px',
+                width: '200px',
+                height: `calc(100% - ${FOOTER_HEIGHT}px)`,
+            }}><UserList /></Box>}
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                margin: '20px auto',
+                width: isMobile ? '100%' : '400px',
+                height: `calc(100% - 40px)`,
+            }}>
+                {isMobile ? <MobileView />
+                    :
+                    <>
+                        <ChatWindow />
+                        <MessageBox />
+                    </>
+                }
+
+            </Box>
+        </Box>
     )
 }

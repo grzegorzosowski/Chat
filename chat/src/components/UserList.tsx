@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import { useEffect, useState } from 'react'
 import { useUser } from '../UserProvider';
 import User from './User'
-import styles from '../styles/UserList.module.css'
 import Link from '@mui/material/Link';
 import { useAppDispatch } from '../hooks';
 import { setActiveChat, setGettingChat } from '../features/chats/chatsSlice';
@@ -10,6 +9,8 @@ import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation }
 import { putMessages } from '../features/messages/messagesSlice';
 import GroupChat from './GroupChat';
 import { Tooltip, Typography } from '@mui/material';
+import { FOOTER_HEIGHT } from './Footer';
+import { useIsMobile } from '../features/useIsMobile';
 interface User {
   _id: string;
   nick: string;
@@ -41,6 +42,7 @@ interface Message {
 
 export default function UserList(): JSX.Element {
   const user = useUser();
+  const isMobile = useIsMobile();
   const dispatch = useAppDispatch();
   const [users, setUsers] = useState<User[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
@@ -72,6 +74,7 @@ export default function UserList(): JSX.Element {
     }
     dispatch(setGettingChat(true));
     if ('nick' in userLink) {  // ### if userLink has nick property, it's a user, not group ### //
+      console.log('userLink: ', userLink)
       findChat({ id1: user._id, id2: userLink._id, nick1: user.nick, nick2: userLink?.nick })
         .unwrap()
         .then((result: Result) => {
@@ -114,13 +117,21 @@ export default function UserList(): JSX.Element {
 
 
   return (
-    <Box className={styles.shape}>
-      <Typography variant='body1' color='gray'>USERS</Typography>
+    <Box sx={(theme) => ({
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 'inherit',
+      height: `calc(100% - ${FOOTER_HEIGHT}px - 20px)`,
+      backgroundColor: theme.palette.mode === 'dark' ? theme.palette.secondary.dark : theme.palette.divider,
+      padding: '10px',
+      borderRadius: isMobile ? '10px' : '0 10px 10px 0',
+    })}>
+      <Typography variant='body1'>USERS</Typography>
       {users && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
         <User key={user.nick} user={user}></User>
       </Link>)}
-      <Typography variant='body1' color='gray'>GROUPS</Typography>
-      {groupChats && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'s'}>
+      {groupChats.length > 0 && <Typography variant='body1' gutterBottom>GROUPS</Typography>}
+      {groupChats && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'Hint'}>
         <Link key={groupChat._id} onClick={() => handleClick(groupChat)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
           <GroupChat groupChat={groupChat} ></GroupChat></Link>
       </Tooltip>)}

@@ -74,7 +74,7 @@ export default function MessageBox(): JSX.Element {
             placeholder={placeholderSwitch()}
             sx={{
                 width: '100%',
-                height: '100%',
+                height: '150px',
                 padding: '5px',
                 boxSizing: 'border-box',
                 opacity: '0.9',

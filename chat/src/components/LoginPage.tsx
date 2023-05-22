@@ -55,7 +55,6 @@ export function LoginForm({ handleSubmit }: { handleSubmit: (email: string, pass
     sx={{
       width: isMobile ? '90%' : '40%',
       margin: 'auto',
-      bgcolor: 'white',
       padding: 2,
       borderRadius: 2,
     }}
