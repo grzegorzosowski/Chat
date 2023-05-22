@@ -6,7 +6,10 @@ import User from '../db/models/User';
 class ChatController {
     async findChat(req: Request, res: Response) {
         const chat = await Chat.findOne({
-            members: { $all: [req.body.id1, req.body.id2] },
+            members: {
+                $size: 2,
+                $all: [req.body.id1, req.body.id2],
+            },
         });
         if (!chat) {
             const newChat = new Chat<ChatType>({
@@ -23,8 +26,8 @@ class ChatController {
     }
 
     async findGroupChat(req: Request, res: Response) {
-        console.log('req.body.groupChatID: ', req.body.groupChatID)
-        const chat = await Chat.findOne({_id: req.body.groupChatID});
+        console.log('req.body.groupChatID: ', req.body.groupChatID);
+        const chat = await Chat.findOne({ _id: req.body.groupChatID });
         console.log('Founded group chat: ', chat);
         res.json(chat);
     }
@@ -32,7 +35,7 @@ class ChatController {
     async createChat(req: Request, res: Response) {
         const chat = await Chat.find({ chatName: req.body.chatName });
         console.log('chat: ', chat);
-        if (chat.length > 0 ) {
+        if (chat.length > 0) {
             const newChat = new Chat<ChatType>({
                 chatName: req.body.chatName + ' ' + chat.length,
                 members: req.body.members.map((member: any) => member._id) + req.body.createdBy,
@@ -42,7 +45,10 @@ class ChatController {
             });
             res.json(newChat);
         } else {
-            console.log('req.body.members ID: ', req.body.members.map((member: any) => member._id));
+            console.log(
+                'req.body.members ID: ',
+                req.body.members.map((member: any) => member._id)
+            );
             const newChat = new Chat<ChatType>({
                 chatName: req.body.chatName,
                 members: req.body.members.map((member: any) => member._id).concat(req.body.createdBy),
@@ -53,7 +59,6 @@ class ChatController {
             });
             res.json(newChat);
         }
-        
     }
 
     async getMessages(req: Request, res: Response) {
