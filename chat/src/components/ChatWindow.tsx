@@ -2,7 +2,6 @@ import { Box, Tooltip, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react'
 import { webSocket } from '../webSocketConfig'
 import { useAppSelector, useAppDispatch } from '../hooks';
-import styles from '../styles/ChatWindow.module.css'
 import { useUser } from '../UserProvider';
 import { addMessage } from '../features/messages/messagesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -82,7 +81,7 @@ export default function ChatWindow(): JSX.Element {
           width: '100%',
           padding: '1rem',
           boxSizing: 'border-box',
-          borderRadius: '10px',
+          borderRadius: '10px 10px 0 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -113,8 +112,22 @@ export default function ChatWindow(): JSX.Element {
               }
               onOpen={() => void onTooltipOpen(mess.senderID)}>
               {mess.senderID === user?._id ?
-                <Box className={styles.myMessage}>{mess.message}</Box> :
-                <Box className={styles.othersMessage}>{mess.message}</Box>
+                <Box sx={{
+                  backgroundColor: '#bbd6b8',
+                  padding: '4px 10px',
+                  marginBottom: '5px',
+                  borderRadius: '10px',
+                  width: 'fit-content',
+                  alignSelf: 'flex-end',
+                }}>{mess.message}</Box> :
+                <Box sx={{
+                  backgroundColor: '#f8c4c4',
+                  padding: '4px 10px',
+                  marginBottom: '5px',
+                  borderRadius: '10px',
+                  width: 'fit-content',
+                  alignSelf: 'flex-start',
+                }}>{mess.message}</Box>
               }
             </Tooltip>)}
         </Box>

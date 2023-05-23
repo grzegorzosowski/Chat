@@ -4,8 +4,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import styles from '../styles/CreateChatModal.module.css'
-import buttonStyle from '../styles/ChatOption.module.css'
 import { useUser } from '../UserProvider';
 import { useEffect, useState } from 'react';
 import { Link } from '@mui/material';
@@ -24,7 +22,11 @@ interface UsersList {
     groupChats: Array<string>;
 }
 
-export default function CreateChatModal() {
+interface FunctionProps {
+    closeLeftMenu: () => void;
+}
+
+export default function CreateChatModal(props: FunctionProps): JSX.Element {
     const isMobile = useIsMobile();
     const user = useUser();
     const [open, setOpen] = useState(false);
@@ -35,6 +37,7 @@ export default function CreateChatModal() {
     const [createChat] = useCreateChatMutation();
     const handleOpen = () => {
         setOpen(true);
+        props.closeLeftMenu();
     }
     const handleClose = () => {
         setNewChatUsers([]);
@@ -94,25 +97,25 @@ export default function CreateChatModal() {
 
     return (
         <Box>
-            <Button onClick={handleOpen} size='small' className={buttonStyle.buttonStyle} >Create group chat</Button>
+            <Button onClick={handleOpen} >Create group chat</Button>
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={{
+                <Box sx={(theme) => ({
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     width: isMobile ? '80%' : '400px',
-                    backgroundColor: 'white',
                     border: '2px solid #000',
                     boxShadow: '24px',
                     padding: '20px',
                     borderRadius: '5px',
-                }}>
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(12, 12, 12, 1)' : 'rgba(255, 255, 255, 1)'
+                })}>
                     <MobileCloseButton handleClose={handleClose}></MobileCloseButton>
                     <Typography variant='h6' sx={{
                         textAlign: 'center',
@@ -153,10 +156,18 @@ export default function CreateChatModal() {
                         {
                             users.length > 0 ?
                                 <>{usersFetched && users && users.map((user: User) =>
-                                    <Link key={user._id} className={styles.checkUserLink} onClick={() => handleClick(user)}>
+                                    <Link
+                                        key={user._id}
+                                        onClick={() => handleClick(user)}
+                                        sx={(theme) => ({
+                                            textDecoration: 'none',
+                                            color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                            fontWeight: 'bold',
+                                            cursor: 'pointer',
+                                        })}>
                                         {newChatUsers.includes(user)
-                                            ? <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
-                                            : <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+                                            ? <UserUnchecked {...user} />
+                                            : <UserChecked {...user} />
                                         }
                                     </Link>
                                 )
@@ -178,4 +189,27 @@ export default function CreateChatModal() {
             </Modal >
         </Box >
     );
+}
+
+function UserUnchecked(user: User) {
+    return <Box sx={{
+        display: 'flex',
+        fontSize: '16px',
+    }}><CheckCircleIcon sx={{
+        color: 'rgb(22, 107, 1)',
+        fontSize: '20px',
+        paddingRight: '5px',
+    }} /><Box>{user.nick}</Box></Box>
+}
+
+function UserChecked(user: User) {
+    return <Box sx={{
+        display: 'flex',
+        fontSize: '16px',
+    }}><CheckCircleIcon sx={{
+        visibility: 'hidden',
+        color: 'rgb(22, 107, 1)',
+        fontSize: '20px',
+        paddingRight: '5px',
+    }} /><Box>{user.nick}</Box></Box>
 }

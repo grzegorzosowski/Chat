@@ -45,7 +45,7 @@ interface ChangeAccount {
     userNick: unknown;
 }
 
-interface GetNick {
+interface UserID {
     userID: string;
 }
 
@@ -75,7 +75,7 @@ export const apiSlice = createApi({
             }),
         }),
         getUserNick: builder.mutation({
-            query: (userID: GetNick) => ({
+            query: (userID: UserID) => ({
                 url: `api/getUserNick`,
                 method: 'POST',
                 body: userID,
@@ -102,6 +102,13 @@ export const apiSlice = createApi({
                 body: accountParam,
             }),
         }),
+        getUserAccountInfo: builder.mutation({
+            query: (userID: UserID) => ({
+                url: 'api/getUserAccountInfo',
+                method: 'POST',
+                body: userID,
+            }),
+        }),
     }),
 });
 
@@ -113,6 +120,7 @@ export const {
     useFindGroupChatMutation,
     useCreateAccountMutation,
     useChangeAccountNickMutation,
+    useGetUserAccountInfoMutation,
 } = apiSlice;
 
 type FindChatResult = ReturnType<typeof useFindChatMutation>;

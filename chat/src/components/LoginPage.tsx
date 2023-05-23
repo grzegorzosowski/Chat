@@ -29,9 +29,9 @@ export default function LoginPage() {
 
       try {
         const res = await fetch('api/login/password', requestOptions);
+        console.log('STATUS', res.status);
         const success = res.status === 200;
         if (success) {
-          await fetch('api/user', { method: 'GET' });
           window.location.replace('/chat');
         } else {
           enqueueSnackbar('Wrong password', { variant: 'error' });
@@ -55,7 +55,6 @@ export function LoginForm({ handleSubmit }: { handleSubmit: (email: string, pass
     sx={{
       width: isMobile ? '90%' : '40%',
       margin: 'auto',
-      bgcolor: 'white',
       padding: 2,
       borderRadius: 2,
     }}

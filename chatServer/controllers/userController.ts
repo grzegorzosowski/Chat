@@ -1,19 +1,25 @@
-import User, { UserType } from '../db/models/User';
+import User, { UserType, UserWithId } from '../db/models/User';
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import Chat from '../db/models/Chat';
 import passwordValidation from '../../chat/src/features/passwordValidation/passwordValidation';
+import { emailVerify, generateToken, verifyToken } from '../lib/emailVerify';
+import { v4 as uuidv4 } from 'uuid';
+import { SerializedUser } from '../authentication';
+import { ObjectId } from 'mongoose';
+import { findUserByEmail, findUserById } from './userFunctions';
 
 const saltRounds = 12;
 
 declare module 'express-session' {
     interface Session {
-        passport: any; // lub użyj bardziej konkretnego typu dla passport
+        passport: any;
     }
 }
+
 class UserController {
     async createUser(req: Request, res: Response) {
-        const userName = req.body.userNick;
+        const userNick = req.body.userNick;
         const userEmail = req.body.userEmail;
         const userPassword = req.body.userPassword;
         console.log('Creating user...');
@@ -21,7 +27,7 @@ class UserController {
         if (passwordValidationResult.includes(false)) {
             return res.status(422).json({ message: 'Password is not valid' });
         }
-        if (userName.length < 3) {
+        if (userNick.length < 3) {
             return res.status(422).json({ message: 'Nick is too short' });
         }
         if (userEmail === '' || !userEmail.includes('@')) {
@@ -32,16 +38,10 @@ class UserController {
             if (checkUserExist) {
                 return res.status(422).json({ message: 'This email already exists' });
             }
-
-            const hashedPassword = await bcrypt.hash(userPassword, saltRounds);
-            const newUser = new User<UserType>({
-                nick: userName,
-                email: userEmail,
-                password: hashedPassword,
-            });
-            await newUser.save().then(() => {
-                console.log('User has been created');
-            });
+            console.log('User does not exist yet');
+            const createdUser = await insertUserToDB(userNick, userPassword, userEmail);
+            console.log('returned created User: ', createdUser);
+            emailVerify(createdUser);
         } catch (err: any) {
             return res.status(422).json({ message: err.message });
         }
@@ -55,7 +55,17 @@ class UserController {
         console.log('changedNick: ', changedNick);
         res.status(200).json(changedNick?.nick);
     }
-
+    async getUserAccountInfo(req: Request, res: Response) {
+        const user = await findUserById(req.body.userID);
+        console.log('🚀 ~ file: userController.ts:60 ~ UserController ~ getUserAccountInfo ~ e:', user);
+        const { lastFailedLogin, lastLogin } = user ?? {};
+        const extractedData = {
+            lastFailedLogin,
+            lastLogin,
+        };
+        console.log('Extracted data: ', extractedData);
+        res.status(200).json(extractedData);
+    }
     async getUserNick(req: Request, res: Response) {
         const userID = req.body.userID;
         const userNick = await User.findById(userID).select('nick');
@@ -70,6 +80,69 @@ class UserController {
 
         res.json({ users, groupChats });
     }
+
+    async emailToken(req: Request, res: Response) {
+        const { token } = req.query;
+        if (typeof token !== 'string') {
+            res.redirect(`/?bad-request`);
+            return;
+        }
+        try {
+            const payload = await verifyToken(token as string);
+
+            const user = await findUserById(payload.userId);
+            if (user == null) {
+                res.redirect(`/?bad-request`);
+                return;
+            }
+
+            if (user.verifyToken !== payload.verifyToken) {
+                return;
+            }
+
+            await User.updateOne(
+                { _id: user._id },
+                {
+                    verified: true,
+                }
+            );
+            const redirectURL = 'http://localhost:3000/emailConfirmed';
+            return res.redirect(redirectURL);
+        } catch (error: any) {
+            console.error(error);
+            res.redirect(`/?unexpected-error`);
+        }
+    }
+    async updateUser(id: string | ObjectId, update: Partial<UserType>) {
+        return await User.updateOne({ _id: id }, { $set: update });
+    }
+
+    async getUserByEmail(email: string) {
+        return await User.findOne({ email });
+    }
 }
 
 export = new UserController();
+
+async function insertUserToDB(nick: string, password: string, email: string): Promise<UserWithId> {
+    console.log('Inserting to DB started...');
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const newUser = new User<UserType>({
+        nick: nick,
+        email: email,
+        password: hashedPassword,
+        verifyToken: uuidv4(),
+        verified: false,
+        registerAt: new Date().toISOString(),
+    });
+    console.log('New User: ', newUser);
+    await newUser.save().then(() => {
+        console.log('User has been created');
+    });
+    const createdUser = await findUserByEmail(newUser.email);
+    if (!createdUser) {
+        console.log('Some errors during inserting');
+        throw new Error();
+    }
+    return createdUser;
+}

@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import styles from '../styles/CreateAccountModal.module.css'
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import InputPassword from './InputPassword';
@@ -11,6 +10,7 @@ import { useSnackbar } from 'notistack';
 import PassValidator from './passValidator';
 import { useIsMobile } from '../features/useIsMobile';
 import MobileCloseButton from './MobileView/MobileCloseButton';
+import { useTheme } from '@mui/material';
 interface FormState {
     userEmail: string;
     userNick: string;
@@ -19,6 +19,7 @@ interface FormState {
 }
 
 export function CreateAccountModal() {
+    const theme = useTheme();
     const [form, setForm] = useState<FormState>({ userEmail: '', userNick: '', userPassword: '', userPasswordRepeat: '' });
     const [open, setOpen] = useState(false);
     const [validationDone, setValidationDone] = useState(false);
@@ -42,12 +43,12 @@ export function CreateAccountModal() {
             .unwrap()
             .then((result) => {
                 console.log('Account created: ', result);
-                enqueueSnackbar('Account created', { variant: 'success' });
+                enqueueSnackbar('Account has been created', { variant: 'success' });
                 handleClose();
             })
             .catch((error) => {
-
                 console.log(error);
+                enqueueSnackbar('Account has not been created ', { variant: 'error' });
             })
     }
 
@@ -67,44 +68,68 @@ export function CreateAccountModal() {
     }
 
 
+
     return (
         <Box>
-            <Button onClick={handleOpen} variant='outlined' sx={{ position: 'fixed', left: '10px', top: '10px' }}>Create account</Button>
+            <Button
+                onClick={handleOpen}
+                variant='outlined'
+                sx={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary.contrastText,
+                    borderColor: theme.palette.mode === 'dark' ? theme.palette.primary.main : theme.palette.secondary.contrastText
+                }}>Create account</Button>
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={{
+                <Box sx={(theme) => ({
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
                     transform: `translate(-50%, -50%)`,
                     width: isMobile ? '90%' : '20%',
-                    backgroundColor: 'white',
                     border: '2px solid #000',
                     boxShadow: '24px',
                     padding: '10px',
                     borderRadius: '5px',
-                }}>
+                    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(12, 12, 12, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                })}>
                     {isMobile && <MobileCloseButton handleClose={setOpen}></MobileCloseButton>}
-                    <Box component='form' onSubmit={handleSubmit} className={styles.form}>
+                    <Box component='form' onSubmit={handleSubmit} sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        height: '100%',
+                        boxSizing: 'border-box',
+                        padding: '10px',
+                    }}>
                         <TextField
-                            className={styles.input}
                             value={form.userEmail}
                             onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
                             label="Email"
                             type="email"
                             size="small"
+                            sx={{
+                                width: '100%',
+                                height: '30px',
+                                marginBottom: '20px !important',
+                            }}
                         ></TextField>
                         <TextField
-                            className={styles.input}
                             value={form.userNick}
                             onChange={(event) => setForm({ ...form, userNick: event.target.value })}
                             label="Nick"
                             type="text"
                             size="small"
+                            sx={{
+                                width: '100%',
+                                height: '30px',
+                                marginBottom: '20px !important',
+                            }}
                         ></TextField>
                         <InputPassword
                             value={form.userPassword}

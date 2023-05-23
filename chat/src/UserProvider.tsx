@@ -5,6 +5,7 @@ export type User = {
     _id: string;
     nick: string;
     email: string;
+    verified: boolean;
 }
 
 const Context = createContext<User | undefined>(undefined);
