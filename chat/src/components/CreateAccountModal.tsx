@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import styles from '../styles/CreateAccountModal.module.css'
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import InputPassword from './InputPassword';
@@ -98,22 +97,39 @@ export function CreateAccountModal() {
                     backgroundColor: theme.palette.mode === 'dark' ? 'rgba(12, 12, 12, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                 })}>
                     {isMobile && <MobileCloseButton handleClose={setOpen}></MobileCloseButton>}
-                    <Box component='form' onSubmit={handleSubmit} className={styles.form}>
+                    <Box component='form' onSubmit={handleSubmit} sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        height: '100%',
+                        boxSizing: 'border-box',
+                        padding: '10px',
+                    }}>
                         <TextField
-                            className={styles.input}
                             value={form.userEmail}
                             onChange={(event) => setForm({ ...form, userEmail: event.target.value })}
                             label="Email"
                             type="email"
                             size="small"
+                            sx={{
+                                width: '100%',
+                                height: '30px',
+                                marginBottom: '20px !important',
+                            }}
                         ></TextField>
                         <TextField
-                            className={styles.input}
                             value={form.userNick}
                             onChange={(event) => setForm({ ...form, userNick: event.target.value })}
                             label="Nick"
                             type="text"
                             size="small"
+                            sx={{
+                                width: '100%',
+                                height: '30px',
+                                marginBottom: '20px !important',
+                            }}
                         ></TextField>
                         <InputPassword
                             value={form.userPassword}

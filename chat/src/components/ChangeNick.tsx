@@ -6,19 +6,12 @@ import TextField from '@mui/material/TextField';
 import { useChangeAccountNickMutation } from '../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
 import { useUser } from '../UserProvider';
-import { useIsMobile } from '../features/useIsMobile';
 
 export function ChangeNick() {
     const user = useUser();
-    const isMobile = useIsMobile();
     const [form, setForm] = useState({ userNick: user?.nick } as Record<string, unknown>);
-    const [open, setOpen] = React.useState(false);
     const { enqueueSnackbar } = useSnackbar();
     const [changeNickFetch] = useChangeAccountNickMutation();
-
-    const handleClose = () => {
-        setOpen(false);
-    }
 
     const changeNick = () => {
         changeNickFetch({
@@ -28,7 +21,6 @@ export function ChangeNick() {
             .then((result) => {
                 console.log('Nick has been changed: ', result);
                 enqueueSnackbar('Nick has been changed', { variant: 'success' });
-                handleClose();
             })
             .catch((error) => {
                 console.log(error);

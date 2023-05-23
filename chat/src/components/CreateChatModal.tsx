@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import styles from '../styles/CreateChatModal.module.css'
 import { useUser } from '../UserProvider';
 import { useEffect, useState } from 'react';
 import { Link } from '@mui/material';
@@ -193,9 +192,24 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
 }
 
 function UserUnchecked(user: User) {
-    return <Box className={styles.linkDistance}><CheckCircleIcon className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+    return <Box sx={{
+        display: 'flex',
+        fontSize: '16px',
+    }}><CheckCircleIcon sx={{
+        color: 'rgb(22, 107, 1)',
+        fontSize: '20px',
+        paddingRight: '5px',
+    }} /><Box>{user.nick}</Box></Box>
 }
 
 function UserChecked(user: User) {
-    return <Box className={styles.linkDistance}><CheckCircleIcon sx={{ visibility: 'hidden' }} className={styles.userChecked} /><Box>{user.nick}</Box></Box>
+    return <Box sx={{
+        display: 'flex',
+        fontSize: '16px',
+    }}><CheckCircleIcon sx={{
+        visibility: 'hidden',
+        color: 'rgb(22, 107, 1)',
+        fontSize: '20px',
+        paddingRight: '5px',
+    }} /><Box>{user.nick}</Box></Box>
 }
