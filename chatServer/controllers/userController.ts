@@ -5,12 +5,15 @@ import Chat from '../db/models/Chat';
 import passwordValidation from '../../chat/src/features/passwordValidation/passwordValidation';
 import { emailVerify, generateToken, verifyToken } from '../lib/emailVerify';
 import { v4 as uuidv4 } from 'uuid';
+import { SerializedUser } from '../authentication';
+import { ObjectId } from 'mongoose';
+import { findUserByEmail, findUserById } from './userFunctions';
 
 const saltRounds = 12;
 
 declare module 'express-session' {
     interface Session {
-        passport: any; // lub użyj bardziej konkretnego typu dla passport
+        passport: any;
     }
 }
 
@@ -52,7 +55,17 @@ class UserController {
         console.log('changedNick: ', changedNick);
         res.status(200).json(changedNick?.nick);
     }
-
+    async getUserAccountInfo(req: Request, res: Response) {
+        const user = await findUserById(req.body.userID);
+        console.log('🚀 ~ file: userController.ts:60 ~ UserController ~ getUserAccountInfo ~ e:', user);
+        const { lastFailedLogin, lastLogin } = user ?? {};
+        const extractedData = {
+            lastFailedLogin,
+            lastLogin,
+        };
+        console.log('Extracted data: ', extractedData);
+        res.status(200).json(extractedData);
+    }
     async getUserNick(req: Request, res: Response) {
         const userID = req.body.userID;
         const userNick = await User.findById(userID).select('nick');
@@ -100,6 +113,13 @@ class UserController {
             res.redirect(`/?unexpected-error`);
         }
     }
+    async updateUser(id: string | ObjectId, update: Partial<UserType>) {
+        return await User.updateOne({ _id: id }, { $set: update });
+    }
+
+    async getUserByEmail(email: string) {
+        return await User.findOne({ email });
+    }
 }
 
 export = new UserController();
@@ -113,6 +133,7 @@ async function insertUserToDB(nick: string, password: string, email: string): Pr
         password: hashedPassword,
         verifyToken: uuidv4(),
         verified: false,
+        registerAt: new Date().toISOString(),
     });
     console.log('New User: ', newUser);
     await newUser.save().then(() => {
@@ -124,12 +145,4 @@ async function insertUserToDB(nick: string, password: string, email: string): Pr
         throw new Error();
     }
     return createdUser;
-}
-
-async function findUserByEmail(email: string) {
-    return await User.findOne<UserWithId>({ email: email });
-}
-
-async function findUserById(id: string) {
-    return User.findById({ _id: id });
 }
