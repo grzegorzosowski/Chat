@@ -53,7 +53,6 @@ class UserController {
         const oldPassword = req.body.oldPassword;
         const newPassword = req.body.newPassword;
         const getUser = await User.findOne({ email: userEmail });
-        console.log('Getted User: ', getUser);
         if (!getUser) {
             return res.status(422);
         }
@@ -73,7 +72,6 @@ class UserController {
         const userNewNick = req.body.userNick;
         const userID = req.session.passport.user._id;
         let changedNick = await User.findByIdAndUpdate(userID, { nick: userNewNick }, { new: true });
-        console.log('changedNick: ', changedNick);
         res.status(200).json(changedNick?.nick);
     }
     async getUserAccountInfo(req: Request, res: Response) {
@@ -94,10 +92,7 @@ class UserController {
 
     async getUsers(req: Request, res: Response) {
         const users = await User.find({ nick: { $ne: req.body.nick } }).select('-password');
-        console.log('req.body._id: ', req.body._id);
         const groupChats = (await Chat.find({ members: req.body._id })).filter((chat: any) => chat.members.length > 2);
-        console.log('groupChats: ', groupChats);
-
         res.json({ users, groupChats });
     }
 
@@ -145,7 +140,6 @@ class UserController {
 export = new UserController();
 
 async function insertUserToDB(nick: string, password: string, email: string): Promise<UserWithId> {
-    console.log('Inserting to DB started...');
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const newUser = new User<UserType>({
         nick: nick,
@@ -156,12 +150,9 @@ async function insertUserToDB(nick: string, password: string, email: string): Pr
         registerAt: new Date().toISOString(),
     });
     console.log('New User: ', newUser);
-    await newUser.save().then(() => {
-        console.log('User has been created');
-    });
+    await newUser.save().then(() => {});
     const createdUser = await findUserByEmail(newUser.email);
     if (!createdUser) {
-        console.log('Some errors during inserting');
         throw new Error();
     }
     return createdUser;
