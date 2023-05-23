@@ -2,11 +2,11 @@ import { Box, Button } from '@mui/material'
 import React from 'react'
 import ProfileInfo from './ProfileInfo';
 import { useIsMobile } from '../../features/useIsMobile';
-import { ChangeAccountParam } from '../ChangeNick';
+import { ChangeNick } from '../ChangeNick';
 
 const MenuItems = [
     { name: 'Profile Info', component: <ProfileInfo /> },
-    { name: 'Change Nick', component: <ChangeAccountParam /> },
+    { name: 'Change Nick', component: <ChangeNick /> },
     { name: 'Change Password', component: <div>Change Password</div> },
 ]
 
@@ -60,7 +60,7 @@ export default function Profile() {
                 <Box
                     sx={(theme) => ({
                         width: '100%',
-                        height: '300px',
+                        minHeight: '300px',
                         backgroundColor:
                             theme.palette.mode === 'dark'
                                 ? theme.palette.divider
@@ -72,9 +72,6 @@ export default function Profile() {
                         sx={{
                             width: '100%',
                             height: '100%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
                         }}
                     >
                         {MenuItems.find((item) => item.name === activeOption)?.component}
