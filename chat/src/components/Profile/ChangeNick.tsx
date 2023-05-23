@@ -3,9 +3,9 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import { useChangeAccountNickMutation } from '../features/api/apiSlice';
+import { useChangeAccountNickMutation } from '../../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
-import { useUser } from '../UserProvider';
+import { useUser } from '../../UserProvider';
 
 export function ChangeNick() {
     const user = useUser();

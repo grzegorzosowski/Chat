@@ -2,12 +2,13 @@ import { Box, Button } from '@mui/material'
 import React from 'react'
 import ProfileInfo from './ProfileInfo';
 import { useIsMobile } from '../../features/useIsMobile';
-import { ChangeNick } from '../ChangeNick';
+import { ChangeNick } from './ChangeNick';
+import ChangePassword from './ChangePassword';
 
 const MenuItems = [
     { name: 'Profile Info', component: <ProfileInfo /> },
     { name: 'Change Nick', component: <ChangeNick /> },
-    { name: 'Change Password', component: <div>Change Password</div> },
+    { name: 'Change Password', component: <ChangePassword /> },
 ]
 
 export default function Profile() {

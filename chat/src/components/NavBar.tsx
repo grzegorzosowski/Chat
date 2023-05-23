@@ -1,11 +1,8 @@
 import React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import { AppBar, Box, Toolbar, IconButton, InputBase, Badge, MenuItem, Menu, Button } from '@mui/material';
+import { AppBar, Box, Toolbar, IconButton, Badge, MenuItem, Menu, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import { LightMode } from '@mui/icons-material';
 import ModeNightIcon from '@mui/icons-material/ModeNight';
@@ -16,33 +13,13 @@ import CreateChatModal from './CreateChatModal';
 import { useIsMobile } from '../features/useIsMobile';
 import { setActiveChat } from '../features/chats/chatsSlice';
 import { useAppDispatch } from '../hooks';
-
-
-
-const requestOptions = {
-    method: 'POST',
-    headers: {
-        'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-    }),
-}
-
-const handleClick = () => {
-    void fetchData();
-}
-
-const fetchData = async () => {
-    await fetch('api/logout', requestOptions)
-    console.log("Button pushed")
-    window.location.replace('/');
-}
-
+import { useLogoutUserMutation } from '../features/api/apiSlice';
 
 export default function PrimarySearchAppBar() {
     const isUser = useUser();
     const isMobile = useIsMobile();
     const dispatch = useAppDispatch();
+    const [logoutUser] = useLogoutUserMutation();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
         React.useState<null | HTMLElement>(null);
@@ -51,6 +28,15 @@ export default function PrimarySearchAppBar() {
     const isLeftMenuOpen = Boolean(leftMenuAnchorEl);
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const handleClick = () => {
+        void fetchData();
+    }
+    const fetchData = async () => {
+        await logoutUser({})
+        window.location.replace('/');
+    }
+
 
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -111,7 +97,6 @@ export default function PrimarySearchAppBar() {
             onClose={handleMenuClose}
         >
             <MenuItem onClick={handleProfile}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
             <MenuItem onClick={handleClick}>Logout</MenuItem>
         </Menu>
     );
@@ -199,11 +184,12 @@ export default function PrimarySearchAppBar() {
                         <ChangeThemeButton />
                         <Box sx={{ flexGrow: 1 }}  ></Box>
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                            <><IconButton size="large" aria-label="show 4 new mails" color="inherit">
+                            <>
+                                {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                                 <Badge badgeContent={4} color="error">
                                     <MailIcon />
                                 </Badge>
-                            </IconButton>
+                            </IconButton> */}
 
                                 <IconButton
                                     size="large"
@@ -260,7 +246,12 @@ function ChangeThemeButton() {
 
 
 
-{/* <Search>
+{/* 
+
+import SearchIcon from '@mui/icons-material/Search';
+import { styled, alpha } from '@mui/material/styles';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+<Search>
     <SearchIconWrapper>
         <SearchIcon />
     </SearchIconWrapper>

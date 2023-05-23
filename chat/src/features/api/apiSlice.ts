@@ -49,6 +49,11 @@ interface UserID {
     userID: string;
 }
 
+type ChangePassword = {
+    oldPassword: string;
+    newPassword: string;
+};
+
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({ baseUrl: '/' }),
@@ -109,6 +114,19 @@ export const apiSlice = createApi({
                 body: userID,
             }),
         }),
+        logoutUser: builder.mutation({
+            query: () => ({
+                url: 'api/logout',
+                method: 'POST',
+            }),
+        }),
+        resetPassword: builder.mutation({
+            query: (passwords: ChangePassword) => ({
+                url: 'api/resetPassword',
+                method: 'POST',
+                body: passwords,
+            }),
+        }),
     }),
 });
 
@@ -121,6 +139,8 @@ export const {
     useCreateAccountMutation,
     useChangeAccountNickMutation,
     useGetUserAccountInfoMutation,
+    useLogoutUserMutation,
+    useResetPasswordMutation,
 } = apiSlice;
 
 type FindChatResult = ReturnType<typeof useFindChatMutation>;

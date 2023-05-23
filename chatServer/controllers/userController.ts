@@ -3,9 +3,8 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import Chat from '../db/models/Chat';
 import passwordValidation from '../../chat/src/features/passwordValidation/passwordValidation';
-import { emailVerify, generateToken, verifyToken } from '../lib/emailVerify';
+import { emailVerify, verifyToken } from '../lib/emailVerify';
 import { v4 as uuidv4 } from 'uuid';
-import { SerializedUser } from '../authentication';
 import { ObjectId } from 'mongoose';
 import { findUserByEmail, findUserById } from './userFunctions';
 
@@ -48,6 +47,28 @@ class UserController {
         return res.status(201).json('User created successfully');
     }
 
+    async resetPassword(req: Request, res: Response) {
+        console.log('Body resetPassword: ', req.body);
+        const userEmail = req.session.passport.user.email;
+        const oldPassword = req.body.oldPassword;
+        const newPassword = req.body.newPassword;
+        const getUser = await User.findOne({ email: userEmail });
+        console.log('Getted User: ', getUser);
+        if (!getUser) {
+            return res.status(422);
+        }
+        if (!(await bcrypt.compare(oldPassword, getUser.password))) {
+            return res.status(422).json({ message: 'Old password is wrong' });
+        }
+        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+        if (await bcrypt.compare(newPassword, getUser.password)) {
+            return res.status(422).json({ message: 'New password is the same as old password' });
+        } else {
+            await User.updateOne({ email: userEmail }, { password: hashedNewPassword });
+            return res.status(200).json({ message: 'Password updated!' });
+        }
+    }
+
     async changeUserNick(req: Request, res: Response) {
         const userNewNick = req.body.userNick;
         const userID = req.session.passport.user._id;
@@ -57,7 +78,6 @@ class UserController {
     }
     async getUserAccountInfo(req: Request, res: Response) {
         const user = await findUserById(req.body.userID);
-        console.log('🚀 ~ file: userController.ts:60 ~ UserController ~ getUserAccountInfo ~ e:', user);
         const { lastFailedLogin, lastLogin } = user ?? {};
         const extractedData = {
             lastFailedLogin,

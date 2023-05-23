@@ -30,6 +30,7 @@ router.post('/api/findGroupChat', ChatController.findGroupChat);
 router.post('/api/getMessages', ChatController.getMessages);
 router.post('/api/createChat', ChatController.createChat);
 router.post('/api/getUserAccountInfo', UserController.getUserAccountInfo);
+router.post('/api/resetPassword', UserController.resetPassword);
 router.post('/api/login/password', function (req, res, next) {
     passport.authenticate('local', async function (err: any, user: UserWithId, info: any) {
         if (err) {
