@@ -1,17 +1,16 @@
 import bcrypt from 'bcrypt';
 import './db/mongoose';
-import User, { UserType } from './db/models/User';
+import User, { UserType, UserWithId } from './db/models/User';
 import { Application } from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { sessionMiddleware } from './sessionMiddleware';
 
-interface SerializedUser {
+export type SerializedUser = {
     _id: string;
     nick: string;
     email: string;
     verified: boolean;
-}
+};
 
 export function initAuthentication(app: Application) {
     passport.use(new LocalStrategy(verify));
@@ -25,6 +24,7 @@ export function initAuthentication(app: Application) {
             verified: theUser.verified,
         };
         process.nextTick(() => {
+            console.log('SERAILIZACJA ZAKONCZONA');
             return done(null, serializedUser);
         });
     });
@@ -37,6 +37,7 @@ export function initAuthentication(app: Application) {
             done(err, undefined);
         }
     });
+
     app.use(passport.initialize());
     app.use(passport.session());
 }
@@ -48,7 +49,7 @@ const verify = async (
 ) => {
     console.log('Verify is now working');
     try {
-        const user = await User.findOne<UserType>({ email: userEmail });
+        const user = await User.findOne<UserWithId>({ email: userEmail });
         if (!user) {
             return cb(null, false);
         }

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Date } from 'mongoose';
 import { WithId } from 'mongodb';
 
 export type UserType = {
@@ -7,6 +7,16 @@ export type UserType = {
     password: string;
     verifyToken: string;
     verified: boolean;
+    registerAt: string;
+    lastLogin?: {
+        timestamp: string;
+        ip: string;
+    };
+    lastFailedLogin?: {
+        timestamp: string;
+        ip: string;
+        userAgent: string;
+    };
 };
 
 export type UserWithId = WithId<UserType>;
@@ -31,6 +41,18 @@ const UserSchema = new mongoose.Schema<UserType>({
     verified: {
         type: Boolean,
         required: true,
+    },
+    registerAt: {
+        type: String,
+        required: true,
+    },
+    lastLogin: {
+        type: Object,
+        required: false,
+    },
+    lastFailedLogin: {
+        type: Object,
+        required: false,
     },
 });
 

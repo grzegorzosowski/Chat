@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import UserController from '../controllers/userController';
 import ChatController from '../controllers/chatController';
-const router = Router();
-import passport = require('passport');
+import passport from 'passport';
+import { UserWithId } from '../db/models/User';
 
+const router = Router();
 router.get('/', (req, res) => {
     res.send('Hello, World!');
     console.log('JEst komunikacja');
@@ -28,13 +29,42 @@ router.post('/api/findChat', ChatController.findChat);
 router.post('/api/findGroupChat', ChatController.findGroupChat);
 router.post('/api/getMessages', ChatController.getMessages);
 router.post('/api/createChat', ChatController.createChat);
-router.post(
-    '/api/login/password',
-    passport.authenticate('local', { failureRedirect: '/login', failureMessage: true }),
-    (req, res) => {
-        res.sendStatus(200);
-    }
-);
+router.post('/api/getUserAccountInfo', UserController.getUserAccountInfo);
+router.post('/api/login/password', function (req, res, next) {
+    passport.authenticate('local', async function (err: any, user: UserWithId, info: any) {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            //If passport could not authenticate user, 'user' variable is empty
+            const userFailedLoginAttempt = await UserController.getUserByEmail(req.body.username);
+            if (!userFailedLoginAttempt) {
+                return res.sendStatus(401);
+            }
+            UserController.updateUser(userFailedLoginAttempt.id, {
+                lastFailedLogin: {
+                    timestamp: new Date().toISOString(),
+                    ip: req.socket.remoteAddress ?? '',
+                    userAgent: req.headers['user-agent'] ?? '',
+                },
+            });
+            return res.sendStatus(401);
+        }
+
+        req.logIn(user, function (err) {
+            if (err) {
+                return next(err);
+            }
+            UserController.updateUser(user._id.toString(), {
+                lastLogin: {
+                    timestamp: new Date().toISOString(),
+                    ip: req.socket.remoteAddress ?? '',
+                },
+            });
+            return res.send(user);
+        });
+    })(req, res, next);
+});
 router.post('/api/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) {
