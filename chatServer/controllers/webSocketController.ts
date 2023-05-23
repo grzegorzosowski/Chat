@@ -39,7 +39,6 @@ export default function initWebSocket(app: Application) {
         verifyClient: async (info: any, done: any) => {
             sessionMiddleware(info.req, {} as any, () => {
                 info.session = info.req.session;
-                console.log('info.req: ', info.req.session)
                 done(info.req.session);
             });
         },

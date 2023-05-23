@@ -24,7 +24,6 @@ import { useIsMobile } from '../features/useIsMobile';
 import { Button } from '@mui/material';
 import { setActiveChat } from '../features/chats/chatsSlice';
 import { useAppDispatch } from '../hooks';
-import { ChangeAccountParam } from './ChangeNick';
 
 
 

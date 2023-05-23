@@ -8,7 +8,7 @@ import { useSnackbar } from 'notistack';
 import { useUser } from '../UserProvider';
 import { useIsMobile } from '../features/useIsMobile';
 
-export function ChangeAccountParam() {
+export function ChangeNick() {
     const user = useUser();
     const isMobile = useIsMobile();
     const [form, setForm] = useState({ userNick: user?.nick } as Record<string, unknown>);
@@ -53,6 +53,9 @@ export function ChangeAccountParam() {
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '300px'
             }}>
             <TextField
                 value={form.userNick}

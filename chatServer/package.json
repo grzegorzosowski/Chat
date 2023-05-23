@@ -19,6 +19,7 @@
         "@types/passport-local-mongoose": "^6.1.1",
         "@types/ws": "^8.5.4",
         "bcrypt": "^5.1.0",
+        "connect-flash": "^0.1.1",
         "connect-mongo": "^5.0.0",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
@@ -36,6 +37,7 @@
         "ws": "^8.13.0"
     },
     "devDependencies": {
+        "@types/connect-flash": "^0.0.37",
         "@types/cookie-parser": "^1.4.3",
         "@types/cors": "^2.8.13",
         "@types/express-session": "^1.17.7",
