@@ -76,8 +76,7 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
                 createdBy: user?._id as string
             })
                 .unwrap()
-                .then((result) => {
-                    console.log('Result: ', result)
+                .then(() => {
                     window.location.reload();
                 })
                 .catch((error) => console.log('Error: ', error));
@@ -86,8 +85,6 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
     }
 
     const handleClick = (userLink: User) => {
-        console.log('Kliknięto na: ', userLink._id);
-        console.log('Name of chat: ', newChatName);
         if (!newChatUsers.find((user: User) => user._id === userLink._id)) {
             setNewChatUsers([...newChatUsers, userLink]);
         } else {

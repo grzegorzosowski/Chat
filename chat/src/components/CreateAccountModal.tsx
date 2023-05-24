@@ -43,8 +43,7 @@ export function CreateAccountModal() {
             userPassword: form.userPassword
         })
             .unwrap()
-            .then((result) => {
-                console.log('Account created: ', result);
+            .then(() => {
                 enqueueSnackbar('Account has been created', { variant: 'success' });
                 handleClose();
             })

@@ -22,8 +22,7 @@ export function ChangeNick() {
             userNick: form.userNick
         })
             .unwrap()
-            .then((result) => {
-                console.log('Nick has been changed: ', result);
+            .then(() => {
                 enqueueSnackbar('Nick has been changed', { variant: 'success' });
             })
             .catch((error) => {

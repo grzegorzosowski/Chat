@@ -22,9 +22,9 @@ class UserController {
         const userNick = req.body.userNick;
         const userEmail = req.body.userEmail;
         const userPassword = req.body.userPassword;
-        console.log('Creating user...');
         const passwordValidationResult = passwordValidation(userPassword);
         const { hasLengthCorrect, hasWhiteListChars } = nickValidation(userNick);
+
         if (!hasLengthCorrect || !hasWhiteListChars) {
             return res.status(422).json({ message: 'Nick is not valid' });
         }
@@ -42,9 +42,7 @@ class UserController {
             if (checkUserExist) {
                 return res.status(422).json({ message: 'This email already exists' });
             }
-            console.log('User does not exist yet');
             const createdUser = await insertUserToDB(userNick, userPassword, userEmail);
-            console.log('returned created User: ', createdUser);
             emailVerify(createdUser);
         } catch (err: any) {
             return res.status(422).json({ message: err.message });
@@ -53,7 +51,6 @@ class UserController {
     }
 
     async resetPassword(req: Request, res: Response) {
-        console.log('Body resetPassword: ', req.body);
         const userEmail = req.session.passport.user.email;
         const oldPassword = req.body.oldPassword;
         const newPassword = req.body.newPassword;
@@ -86,7 +83,6 @@ class UserController {
             lastFailedLogin,
             lastLogin,
         };
-        console.log('Extracted data: ', extractedData);
         res.status(200).json(extractedData);
     }
     async getUserNick(req: Request, res: Response) {
@@ -154,7 +150,6 @@ async function insertUserToDB(nick: string, password: string, email: string): Pr
         verified: false,
         registerAt: new Date().toISOString(),
     });
-    console.log('New User: ', newUser);
     await newUser.save().then(() => {});
     const createdUser = await findUserByEmail(newUser.email);
     if (!createdUser) {

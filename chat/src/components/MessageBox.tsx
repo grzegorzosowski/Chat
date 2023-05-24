@@ -43,7 +43,6 @@ export default function MessageBox(): JSX.Element {
                     timestamp: new Date().getTime(),
                 }
                 dispatch(addMessage(newMessage))
-                console.log('New Message: ', newMessage);
                 sendMessage(JSON.stringify(newMessage));
                 setMessageText('')
             }
@@ -52,7 +51,6 @@ export default function MessageBox(): JSX.Element {
     const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => { if (activeChat.chatID !== '1') { setMessageText(event.target.value) } }
     const sendMessage = (messages: string) => {
         if (webSocket) {
-            console.log("SENDED TO SERVER")
             webSocket.send(messages);
         }
     };

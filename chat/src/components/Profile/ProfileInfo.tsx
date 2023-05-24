@@ -75,16 +75,11 @@ export default function ProfileInfo() {
 }
 
 
-
-
-
-
 const Verified = () => {
     return (
         <Typography variant='subtitle2' sx={{ color: 'green', ml: '20px' }}>VERIFIED</Typography>
     )
 }
-
 
 const NotVerified = () => {
     return (

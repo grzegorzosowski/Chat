@@ -63,8 +63,6 @@ export default function ChatWindow(): JSX.Element {
       }
       reader.readAsText(event.data)
     }
-
-    console.log('Chatname: ', activeChat.chatName)
     ws.addEventListener('message', onMessage);
     return () => {
       ws.removeEventListener('open', open);

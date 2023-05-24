@@ -37,7 +37,6 @@ export default function LoginPage() {
           enqueueSnackbar('Wrong password', { variant: 'error' });
         }
       } catch (error) {
-        console.log('Some error during logging');
         console.error(error);
       }
     }

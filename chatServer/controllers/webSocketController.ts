@@ -49,18 +49,14 @@ export default function initWebSocket(app: Application) {
         if (!user) {
             return;
         }
-        console.log('user._id', user._id);
         pushConnection(connectedClients, user._id, socket);
-        console.log('Conneted clients: ', connectedClients);
         sendConnectedClients(connectedClients);
         socket.on('message', reciveMessage(socket, user));
         socket.on('close', () => {
-            console.log('Client disconnected');
             const userId = String(user._id);
             const theRestClients = connectedClients[userId]?.filter((sock) => sock !== socket);
             if (!theRestClients || theRestClients.length === 0) {
                 delete connectedClients[userId];
-                console.log('CLIENT DELETED');
             } else {
                 connectedClients[userId] = theRestClients;
             }
@@ -71,7 +67,6 @@ export default function initWebSocket(app: Application) {
     function reciveMessage(client: WebSocket, user: UserWithId) {
         return async function (message: string) {
             let messageObject = JSON.parse(message);
-            console.log('Message from client: ', messageObject);
             if (messageObject === 'getUsers') {
                 sendConnectedClients(connectedClients);
             } else {
@@ -125,7 +120,6 @@ export default function initWebSocket(app: Application) {
             content: loggedUsers,
         };
         const messageBytes = Buffer.from(JSON.stringify(message));
-        console.log('ZALOGOWANI UŻYTKOWNICY: ', loggedUsers);
         for (const connectedClient in connectedClients) {
             if (connectedClients.hasOwnProperty(connectedClient)) {
                 const webSockets = connectedClients[connectedClient];
