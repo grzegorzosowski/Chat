@@ -107,7 +107,6 @@ export default function UserList(): JSX.Element {
     }
     dispatch(setGettingChat(true));
     if ('nick' in userLink) {  // ### if userLink has nick property, it's a user, not group ### //
-      console.log('userLink: ', userLink)
       findChat({ id1: user._id, id2: userLink._id, nick1: user.nick, nick2: userLink?.nick })
         .unwrap()
         .then((result: Result) => {
