@@ -1,11 +1,16 @@
 import React from 'react';
-import { AppBar, Box, Toolbar, IconButton, Badge, MenuItem, Menu, Button } from '@mui/material';
+import { AppBar, Box, Toolbar, IconButton, Badge, MenuItem, Menu, Button, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import ChatIcon from '@mui/icons-material/Chat';
+import CreateIcon from '@mui/icons-material/Create';
 import { LightMode } from '@mui/icons-material';
 import ModeNightIcon from '@mui/icons-material/ModeNight';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useUser } from '../UserProvider';
 import { CreateAccountModal } from './CreateAccountModal';
 import { useCurrentTheme } from '../features/currentThemeProvider';
@@ -74,7 +79,7 @@ export default function PrimarySearchAppBar() {
     }
 
     const leftMenuItems = [
-        { id: '1', name: 'Create group chat', component: <CreateChatModal closeLeftMenu={handleLeftMenuClose} /> },
+        { id: '1', name: 'Create group chat', component: <CreateChatModal closeLeftMenu={handleLeftMenuClose} />, icon: <CreateIcon /> },
     ]
 
 
@@ -96,8 +101,8 @@ export default function PrimarySearchAppBar() {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleProfile}>Profile</MenuItem>
-            <MenuItem onClick={handleClick}>Logout</MenuItem>
+            <MenuItem onClick={handleProfile}><SettingsIcon fontSize='small' sx={{ mr: '15px' }} />Profile</MenuItem>
+            <MenuItem onClick={handleClick}><PowerSettingsNewIcon fontSize='small' sx={{ mr: '15px' }} />Logout</MenuItem>
         </Menu>
     );
 
@@ -118,25 +123,26 @@ export default function PrimarySearchAppBar() {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
         >
-            <MenuItem>
+            {/* <MenuItem>
                 <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                     <Badge badgeContent={4} color="error">
                         <MailIcon />
                     </Badge>
                 </IconButton>
                 <p>Messages</p>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem onClick={handleProfileMenuOpen}>
                 <IconButton
-                    size="large"
+                    size="small"
                     aria-label="account of current user"
                     aria-controls="primary-search-account-menu"
                     aria-haspopup="true"
                     color="inherit"
+                    sx={{ mr: '10px' }}
                 >
                     <AccountCircle />
                 </IconButton>
-                <p>Profile</p>
+                <p>Account</p>
             </MenuItem>
         </Menu>
     );
@@ -158,9 +164,9 @@ export default function PrimarySearchAppBar() {
             onClose={handleLeftMenuClose}
             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
         >
-            {isMobile && <Button onClick={handleSelectChat} sx={{ width: '100%', justifyContent: 'flex-start' }}>Select chat</Button>}
+            {isMobile && <MenuItem onClick={handleSelectChat} sx={{ width: '100%' }}><ChatIcon sx={{ mr: '10px' }} />Select chat</MenuItem>}
             {leftMenuItems.map((item) => (
-                <Box key={item.id}>{item.component}</Box>))}
+                <MenuItem key={item.id}><Typography sx={{ mr: '10px' }}>{item.icon}</Typography>{item.component}</MenuItem>))}
         </Menu>
     )
 
@@ -178,11 +184,11 @@ export default function PrimarySearchAppBar() {
                         sx={{ mr: 1 }}
                         onClick={handleLeftMenuOpen}
                     >
-                        <MenuIcon />
+                        {isLeftMenuOpen ? <ExpandLessIcon /> : <MenuIcon />}
                     </IconButton>
 
                         <ChangeThemeButton />
-                        <Box sx={{ flexGrow: 1 }}  ></Box>
+                        <Box sx={{ flexGrow: 1, cursor: 'pointer', pl: '20px' }} onClick={() => { window.location.replace('/') }}>CHAT</Box>
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                             <>
                                 {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
@@ -212,10 +218,10 @@ export default function PrimarySearchAppBar() {
                                 onClick={handleMobileMenuOpen}
                                 color="inherit"
                             >
-                                <MoreIcon />
+                                {isMobileMenuOpen ? <ExpandLessIcon /> : <MoreIcon />}
                             </IconButton>
                         </Box> </> :
-                        <><ChangeThemeButton /> <CreateAccountModal /></>}
+                        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}><ChangeThemeButton /> <CreateAccountModal /></Box>}
                 </Toolbar>
             </AppBar>
             {leftMenu}
