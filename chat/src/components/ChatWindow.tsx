@@ -13,7 +13,7 @@ interface MessageData {
   senderID: string;
   chatID: string;
   message: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 type ServerMessage = {
@@ -56,7 +56,7 @@ export default function ChatWindow(): JSX.Element {
               senderID: serverData.content.senderID,
               chatID: serverData.content.chatID,
               message: serverData.content?.message,
-              timestamp: new Date(serverData.content?.timestamp).toISOString(),
+              timestamp: new Date(serverData.content?.timestamp).getTime(),
             }))
           }
         }
@@ -64,18 +64,6 @@ export default function ChatWindow(): JSX.Element {
       reader.readAsText(event.data)
     }
 
-    // const onMessage = (event: MessageEvent<string>) => {
-    //   const data = JSON.parse(event.data, undefined) as MessageData;
-    //   if (data.chatID === activeChat.chatID) {
-    //     dispatch(addMessage({
-    //       messageID: data.messageID,
-    //       senderID: data.senderID,
-    //       chatID: data.chatID,
-    //       message: data?.message,
-    //       timestamp: new Date(data?.timestamp).toISOString(),
-    //     }))
-    //   }
-    // }
     console.log('Chatname: ', activeChat.chatName)
     ws.addEventListener('message', onMessage);
     return () => {
@@ -134,28 +122,20 @@ export default function ChatWindow(): JSX.Element {
               title={userNick !== '' &&
                 <>
                   <Typography variant="caption" sx={{ display: 'block' }}>{userNick}</Typography>
-                  <Typography variant="caption" >{mess.timestamp.toString()}</Typography>
+                  <Typography variant="caption" >{new Date(mess.timestamp).toLocaleString()}</Typography>
                 </>
               }
               onOpen={() => void onTooltipOpen(mess.senderID)}>
-              {mess.senderID === user?._id ?
-                <Box sx={{
-                  backgroundColor: '#bbd6b8',
-                  padding: '4px 10px',
-                  marginBottom: '5px',
-                  borderRadius: '10px',
-                  width: 'fit-content',
-                  alignSelf: 'flex-end',
-                }}>{mess.message}</Box> :
-                <Box sx={{
-                  backgroundColor: '#f8c4c4',
-                  padding: '4px 10px',
-                  marginBottom: '5px',
-                  borderRadius: '10px',
-                  width: 'fit-content',
-                  alignSelf: 'flex-start',
-                }}>{mess.message}</Box>
-              }
+
+              <Box sx={{
+                backgroundColor: mess.senderID === user?._id ? '#bbd6b8' : '#f8c4c4',
+                padding: '4px 10px',
+                marginBottom: '5px',
+                borderRadius: '10px',
+                width: 'fit-content',
+                alignSelf: mess.senderID === user?._id ? 'flex-end' : 'flex-start',
+              }}>{mess.message}</Box>
+
             </Tooltip>)}
         </Box>
       }

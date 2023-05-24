@@ -40,7 +40,7 @@ export default function MessageBox(): JSX.Element {
                     senderID: user?._id as string,
                     chatID: activeChat.chatID,
                     message: messageText,
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date().getTime(),
                 }
                 dispatch(addMessage(newMessage))
                 console.log('New Message: ', newMessage);

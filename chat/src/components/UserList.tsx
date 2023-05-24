@@ -38,7 +38,7 @@ interface Message {
   senderID: string;
   chatID: string;
   message: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 type ServerMessage = {
