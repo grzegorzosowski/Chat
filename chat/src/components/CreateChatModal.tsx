@@ -6,7 +6,7 @@ import Modal from '@mui/material/Modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useUser } from '../UserProvider';
 import { useEffect, useState } from 'react';
-import { Link } from '@mui/material';
+import { Link, MenuItem } from '@mui/material';
 import { useCreateChatMutation } from '../features/api/apiSlice';
 import { enqueueSnackbar } from 'notistack';
 import { useIsMobile } from '../features/useIsMobile';
@@ -96,8 +96,8 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
     }
 
     return (
-        <Box>
-            <Button onClick={handleOpen} >Create group chat</Button>
+        <>
+            <MenuItem onClick={handleOpen} sx={{ m: '0px', p: '0px' }}>Create group chat</MenuItem>
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -187,7 +187,7 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
                 </Box>
 
             </Modal >
-        </Box >
+        </>
     );
 }
 
