@@ -7,17 +7,17 @@ import Messages, { MessagesType } from '../db/models/Messages';
 import { sessionMiddleware } from '../sessionMiddleware';
 import { UserWithId } from '../db/models/User';
 
-interface ConnectedClient {
-    socket: WebSocket;
-    userID: string;
-}
-
 function getUserFromReq(req: any) {
     return req.session?.passport?.user;
 }
 
 type ConnectedClients = {
     [key: string]: Array<WebSocket>;
+};
+
+type ServerMessage = {
+    type: string;
+    content: any;
 };
 
 function pushConnection(obj: ConnectedClients, userId: mongoose.ObjectId, socket: WebSocket) {
@@ -52,6 +52,7 @@ export default function initWebSocket(app: Application) {
         console.log('user._id', user._id);
         pushConnection(connectedClients, user._id, socket);
         console.log('Conneted clients: ', connectedClients);
+        sendConnectedClients(connectedClients);
         socket.on('message', reciveMessage(socket, user));
         socket.on('close', () => {
             console.log('Client disconnected');
@@ -59,9 +60,11 @@ export default function initWebSocket(app: Application) {
             const theRestClients = connectedClients[userId]?.filter((sock) => sock !== socket);
             if (!theRestClients || theRestClients.length === 0) {
                 delete connectedClients[userId];
+                console.log('CLIENT DELETED');
             } else {
                 connectedClients[userId] = theRestClients;
             }
+            sendConnectedClients(connectedClients);
         });
     });
 
@@ -69,49 +72,67 @@ export default function initWebSocket(app: Application) {
         return async function (message: string) {
             let messageObject = JSON.parse(message);
             console.log('Message from client: ', messageObject);
-
-            if (mongoose.Types.ObjectId.isValid(messageObject.chatID)) {
-                const findChat = await Chat.findOne({ _id: messageObject.chatID });
-                if (findChat?.members?.find((member) => member === String(user._id)) == null) {
-                    console.warn('User does not benong to this chat', messageObject.chatID);
-                    return;
-                }
-                if (messageObject.chatID === JSON.stringify(findChat?._id).replace(/"/g, '')) {
-                    const newMessage = new Messages<MessagesType>({
-                        chatID: messageObject.chatID,
-                        senderID: messageObject.senderID,
-                        messageID: messageObject.messageID,
-                        message: messageObject.message,
-                        timestamp: messageObject.timestamp,
-                    });
-                    await newMessage.save().then(() => {
-                        console.log('Message has been created');
-                    });
-                }
-                const targetClientsIDs = findChat?.members?.filter((member) => member !== messageObject.senderID);
-                console.log('Target clients IDs: ', targetClientsIDs);
-                if (targetClientsIDs) {
-                    for (const targetClientId of targetClientsIDs) {
-                        const targetClientSockets = connectedClients[String(targetClientId)];
-                        if (targetClientSockets) {
-                            for (const targetSocket of targetClientSockets) {
-                                targetSocket.send(JSON.stringify(messageObject));
-                                console.log('Message sent to client: ', targetClientId);
+            if (messageObject === 'getUsers') {
+                sendConnectedClients(connectedClients);
+            } else {
+                const messageToSend: ServerMessage = {
+                    type: 'message',
+                    content: messageObject,
+                };
+                if (mongoose.Types.ObjectId.isValid(messageObject.chatID)) {
+                    const findChat = await Chat.findOne({ _id: messageObject.chatID });
+                    if (findChat?.members?.find((member) => member === String(user._id)) == null) {
+                        console.warn('User does not belong to this chat', messageObject.chatID);
+                        return;
+                    }
+                    if (messageObject.chatID === JSON.stringify(findChat?._id).replace(/"/g, '')) {
+                        const newMessage = new Messages<MessagesType>({
+                            chatID: messageObject.chatID,
+                            senderID: messageObject.senderID,
+                            messageID: messageObject.messageID,
+                            message: messageObject.message,
+                            timestamp: messageObject.timestamp,
+                        });
+                        await newMessage.save().then(() => {
+                            console.log('Message has been created');
+                        });
+                    }
+                    const targetClientsIDs = findChat?.members?.filter((member) => member !== messageObject.senderID);
+                    console.log('Target clients IDs: ', targetClientsIDs);
+                    if (targetClientsIDs) {
+                        for (const targetClientId of targetClientsIDs) {
+                            const targetClientSockets = connectedClients[String(targetClientId)];
+                            if (targetClientSockets) {
+                                for (const targetSocket of targetClientSockets) {
+                                    targetSocket.send(Buffer.from(JSON.stringify(messageToSend)));
+                                    console.log('Message sent to client: ', targetClientId);
+                                }
                             }
                         }
                     }
+                } else {
+                    console.log('ChatID is incorrect');
+                    console.log('ChatID: ', messageObject.chatID);
                 }
-                // connectedClients.forEach((client) => {
-                //     if (targetClientsIDs?.includes(client.userID)) {
-                //         client.socket.send(JSON.stringify(messageObject));
-                //         console.log('Message sent to client: ', client.userID);
-                //     }
-                // });
-                //client.send(JSON.stringify(messageObject));
-            } else {
-                console.log('ChatID is incorrect');
-                console.log('ChatID: ', messageObject.chatID);
             }
         };
+    }
+
+    function sendConnectedClients(connectedClients: ConnectedClients) {
+        const loggedUsers: string[] = Object.keys(connectedClients);
+        const message: ServerMessage = {
+            type: 'loggedUsers',
+            content: loggedUsers,
+        };
+        const messageBytes = Buffer.from(JSON.stringify(message));
+        console.log('ZALOGOWANI UŻYTKOWNICY: ', loggedUsers);
+        for (const connectedClient in connectedClients) {
+            if (connectedClients.hasOwnProperty(connectedClient)) {
+                const webSockets = connectedClients[connectedClient];
+                webSockets.map((socket) => {
+                    socket.send(messageBytes);
+                });
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ import GroupChat from './GroupChat';
 import { Tooltip, Typography } from '@mui/material';
 import { FOOTER_HEIGHT } from './Footer';
 import { useIsMobile } from '../features/useIsMobile';
+import { webSocket } from '../webSocketConfig';
 interface User {
   _id: string;
   nick: string;
@@ -40,6 +41,11 @@ interface Message {
   timestamp: string;
 }
 
+type ServerMessage = {
+  type: string;
+  content: Array<string>;
+};
+
 export default function UserList(): JSX.Element {
   const user = useUser();
   const isMobile = useIsMobile();
@@ -47,15 +53,21 @@ export default function UserList(): JSX.Element {
   const [users, setUsers] = useState<User[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
+  const [serverData, setServerData] = useState<Array<string> | null>(null);
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
   const [findGroupChat] = useFindGroupChatMutation();
+
+
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nick: user?.nick, _id: user?._id } as Record<string, unknown>),
   };
   useEffect(() => {
+
+    const ws = webSocket;
+    ws.send(JSON.stringify('getUsers'))
     function getUsers() {
       fetch('/api/getUsers', requestOptions)
         .then((response) => response.json())
@@ -67,6 +79,27 @@ export default function UserList(): JSX.Element {
       setUsersFetched(true);
     }
   }, []);
+
+  useEffect(() => {
+    const ws = webSocket;
+    const onMessage = (event: MessageEvent<Blob>) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = reader.result as string;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const serverData: ServerMessage = JSON.parse(data)
+        if (serverData.type === 'loggedUsers') {
+          setServerData(serverData.content);
+          console.log('ZALOGOWANI UŻYTKOWNICY: ', serverData)
+        }
+      }
+      reader.readAsText(event.data)
+    }
+    ws.addEventListener('message', onMessage);
+    return () => {
+      ws.removeEventListener('message', onMessage)
+    };
+  }, [serverData])
 
   const handleClick = (userLink: User | GroupChat) => {
     if (user == null) {
@@ -128,7 +161,7 @@ export default function UserList(): JSX.Element {
     })}>
       <Typography variant='body1'>USERS</Typography>
       {users && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
-        <User key={user.nick} user={user}></User>
+        <User key={user.nick} user={user} isLogged={serverData?.includes(user._id)}></User>
       </Link>)}
       {groupChats.length > 0 && <Typography variant='body1' gutterBottom>GROUPS</Typography>}
       {groupChats && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'Hint'}>

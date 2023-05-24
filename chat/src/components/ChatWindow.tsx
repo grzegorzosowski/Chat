@@ -16,6 +16,12 @@ interface MessageData {
   timestamp: string;
 }
 
+type ServerMessage = {
+  type: string;
+  content: MessageData;
+};
+
+
 
 export default function ChatWindow(): JSX.Element {
   const user = useUser();
@@ -37,18 +43,39 @@ export default function ChatWindow(): JSX.Element {
     }
     ws.addEventListener('open', open);
 
-    const onMessage = (event: MessageEvent<string>) => {
-      const data = JSON.parse(event.data, undefined) as MessageData;
-      if (data.chatID === activeChat.chatID) {
-        dispatch(addMessage({
-          messageID: data.messageID,
-          senderID: data.senderID,
-          chatID: data.chatID,
-          message: data?.message,
-          timestamp: new Date(data?.timestamp).toISOString(),
-        }))
+    const onMessage = (event: MessageEvent<Blob>) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = reader.result as string;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const serverData: ServerMessage = JSON.parse(data)
+        if (serverData.type === 'message') {
+          if (serverData.content.chatID === activeChat.chatID) {
+            dispatch(addMessage({
+              messageID: serverData.content.messageID,
+              senderID: serverData.content.senderID,
+              chatID: serverData.content.chatID,
+              message: serverData.content?.message,
+              timestamp: new Date(serverData.content?.timestamp).toISOString(),
+            }))
+          }
+        }
       }
+      reader.readAsText(event.data)
     }
+
+    // const onMessage = (event: MessageEvent<string>) => {
+    //   const data = JSON.parse(event.data, undefined) as MessageData;
+    //   if (data.chatID === activeChat.chatID) {
+    //     dispatch(addMessage({
+    //       messageID: data.messageID,
+    //       senderID: data.senderID,
+    //       chatID: data.chatID,
+    //       message: data?.message,
+    //       timestamp: new Date(data?.timestamp).toISOString(),
+    //     }))
+    //   }
+    // }
     console.log('Chatname: ', activeChat.chatName)
     ws.addEventListener('message', onMessage);
     return () => {
