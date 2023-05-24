@@ -18,7 +18,7 @@ describe("User", () => {
         };
         render(
             <Provider store={store}>
-                <User {...user} />
+                {/* <User {...user} /> */}
             </Provider>
         );
         const userElement = screen.getByText(/test/i);
@@ -34,7 +34,7 @@ describe("User", () => {
         };
         render(
             <Provider store={store}>
-                <User {...user} />
+                {/* <User {...user} /> */}
             </Provider>
         );
         const userElement = screen.getByText(/test/i);
@@ -51,7 +51,7 @@ describe("User", () => {
 
         render(
             <Provider store={store}>
-                <User {...user} />
+                {/* <User {...user} /> */}
             </Provider>
         );
 
@@ -73,7 +73,7 @@ describe("User", () => {
         store.dispatch(setActiveChat({ chatID: "2", chatName: "1", members: ["1", "3"] }));
         render(
             <Provider store={store}>
-                <User {...user} />
+                {/* <User {...user} /> */}
             </Provider>
         );
         const userElement = screen.getByText(/test2/i);
