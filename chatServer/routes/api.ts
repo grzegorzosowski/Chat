@@ -10,7 +10,6 @@ router.get('/', (req, res) => {
     console.log('JEst komunikacja');
 });
 
-router.get('/api/createUser', UserController.createUser);
 router.get('/api/user', loggedIn, function (req: any, res, next) {
     const userToSend = {
         _id: req.user?._id,

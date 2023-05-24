@@ -65,8 +65,11 @@ export default function Profile() {
                         backgroundColor:
                             theme.palette.mode === 'dark'
                                 ? theme.palette.divider
-                                : theme.palette.neutral?.light,
+                                : 'inherit',
                         borderRadius: '5px',
+                        border: theme.palette.mode === 'dark'
+                            ? 'none'
+                            : `1px solid ${theme.palette.divider}`
                     })}
                 >
                     <Box
