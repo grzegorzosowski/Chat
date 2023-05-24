@@ -188,7 +188,8 @@ export default function PrimarySearchAppBar() {
                     </IconButton>
 
                         <ChangeThemeButton />
-                        <Box sx={{ flexGrow: 1, cursor: 'pointer', pl: '20px' }} onClick={() => { window.location.replace('/') }}>CHAT</Box>
+                        <Box sx={{ cursor: 'pointer', pl: '20px' }} onClick={() => { window.location.replace('/') }}>CHAT</Box>
+                        <Box sx={{ flexGrow: 1 }} />
                         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                             <>
                                 {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">

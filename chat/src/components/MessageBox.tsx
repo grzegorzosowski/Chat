@@ -35,7 +35,6 @@ export default function MessageBox(): JSX.Element {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
             if (messageText.length > 0) {
-                console.log('Message: ', messages);
                 const newMessage = {
                     messageID: (messages[messages?.length - 1]?.messageID + 1) || 1,
                     senderID: user?._id as string,
@@ -53,6 +52,7 @@ export default function MessageBox(): JSX.Element {
     const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => { if (activeChat.chatID !== '1') { setMessageText(event.target.value) } }
     const sendMessage = (messages: string) => {
         if (webSocket) {
+            console.log("SENDED TO SERVER")
             webSocket.send(messages);
         }
     };
