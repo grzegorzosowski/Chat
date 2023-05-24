@@ -7,10 +7,12 @@ import TextField from '@mui/material/TextField';
 import InputPassword from './InputPassword';
 import { useCreateAccountMutation } from '../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
-import PassValidator from './passValidator';
+import PassValidator from './validators/PassValidator';
 import { useIsMobile } from '../features/useIsMobile';
 import MobileCloseButton from './MobileView/MobileCloseButton';
 import { useTheme } from '@mui/material';
+import NickValidator from './validators/NickValidator';
+import { isNickValid } from '../features/validations/nickValidation';
 interface FormState {
     userEmail: string;
     userNick: string;
@@ -56,8 +58,8 @@ export function CreateAccountModal() {
         event.preventDefault();
         if (form.userEmail === "") {
             enqueueSnackbar('Email is required', { variant: 'error' });
-        } else if (form.userNick.length < 3) {
-            enqueueSnackbar('Nick require at least 3 signs', { variant: 'error' });
+        } else if (form.userNick.length < 3 || !isNickValid(form.userNick)) {
+            enqueueSnackbar('Nick is not valid', { variant: 'error' });
         } else if (!validationDone) {
             enqueueSnackbar('Password is not valid', { variant: 'error' });
         } else if (form.userPassword !== form.userPasswordRepeat && validationDone) {
@@ -89,7 +91,7 @@ export function CreateAccountModal() {
                     top: '50%',
                     left: '50%',
                     transform: `translate(-50%, -50%)`,
-                    width: isMobile ? '90%' : '20%',
+                    width: isMobile ? '90%' : '350px',
                     border: '2px solid #000',
                     boxShadow: '24px',
                     padding: '10px',
@@ -141,6 +143,7 @@ export function CreateAccountModal() {
                             onChange={(event) => setForm({ ...form, userPasswordRepeat: event.target.value })}
                             text={'Password'}
                         ></InputPassword>
+                        <NickValidator nick={form.userNick} />
                         <PassValidator password={form.userPassword} passwordCorrect={setValidationDone}></PassValidator>
                         <Button
                             type="submit"

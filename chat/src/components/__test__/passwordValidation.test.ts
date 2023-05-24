@@ -1,4 +1,4 @@
-import passwordValidation from '../../features/passwordValidation/passwordValidation';
+import passwordValidation from '../../features/validations/passwordValidation';
 
 describe('Password validation', () => {
     it('passwordValidation returns true for a valid password', () => {

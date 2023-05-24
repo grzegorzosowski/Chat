@@ -2,7 +2,8 @@ import User, { UserType, UserWithId } from '../db/models/User';
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import Chat from '../db/models/Chat';
-import passwordValidation from '../../chat/src/features/passwordValidation/passwordValidation';
+import passwordValidation from '../../chat/src/features/validations/passwordValidation';
+import { nickValidation } from '../../chat/src/features/validations/nickValidation';
 import { emailVerify, verifyToken } from '../lib/emailVerify';
 import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongoose';
@@ -23,6 +24,10 @@ class UserController {
         const userPassword = req.body.userPassword;
         console.log('Creating user...');
         const passwordValidationResult = passwordValidation(userPassword);
+        const { hasLengthCorrect, hasWhiteListChars } = nickValidation(userNick);
+        if (!hasLengthCorrect || !hasWhiteListChars) {
+            return res.status(422).json({ message: 'Nick is not valid' });
+        }
         if (passwordValidationResult.includes(false)) {
             return res.status(422).json({ message: 'Password is not valid' });
         }

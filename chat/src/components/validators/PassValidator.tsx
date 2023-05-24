@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
-import passwordValidation from '../features/passwordValidation/passwordValidation';
+import passwordValidation from '../../features/validations/passwordValidation';
+import { Condition } from './Condition';
 
 type PassValidatorProps = {
   password: string;
@@ -30,25 +29,4 @@ export default function PassValidator({ password, passwordCorrect }: PassValidat
     </Box>
   );
 }
-function Correct({ children }: { children: React.ReactNode }) {
-  return (
-    <Box sx={{ color: 'green', display: 'flex', mb: '5px' }}>
-      <CheckIcon sx={{ mr: '10px' }} />
-      <Box>{children}</Box>
-    </Box>
-  );
-}
 
-function Incorrect({ children }: { children: React.ReactNode }) {
-  return (
-    <Box sx={{ color: 'red', display: 'flex', mb: '5px' }}>
-      <ClearIcon sx={{ mr: '10px' }} />
-      <Box>{children}</Box>
-    </Box>
-  );
-}
-
-function Condition({ value, children }: { value: boolean; children: React.ReactNode }) {
-  const Wrapper = value ? Correct : Incorrect;
-  return <Wrapper>{children}</Wrapper>;
-}

@@ -6,10 +6,14 @@ import TextField from '@mui/material/TextField';
 import { useChangeAccountNickMutation } from '../../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
 import { useUser } from '../../UserProvider';
+import { isNickValid } from '../../features/validations/nickValidation';
+import NickValidator from '../validators/NickValidator';
+
 
 export function ChangeNick() {
     const user = useUser();
-    const [form, setForm] = useState({ userNick: user?.nick } as Record<string, unknown>);
+    const isUser = !!user;
+    const [form, setForm] = useState({ userNick: isUser ? user.nick : '' });
     const { enqueueSnackbar } = useSnackbar();
     const [changeNickFetch] = useChangeAccountNickMutation();
 
@@ -30,10 +34,16 @@ export function ChangeNick() {
 
     const handleSubmit = (event: React.FormEvent<Element>) => {
         event.preventDefault();
-        if (form.userNick !== user?.nick) {
-            void changeNick();
-        } else {
-            enqueueSnackbar('New nick is same as old one', { variant: 'error' });
+        if (form.userNick !== undefined) {
+            if (form.userNick === user?.nick) {
+                enqueueSnackbar('New nick is same as old one', { variant: 'error' });
+            } else if (form.userNick.length < 3) {
+                enqueueSnackbar('Nick is too short', { variant: 'error' });
+            } else if (!isNickValid(form.userNick)) {
+                enqueueSnackbar('Nick contains forbidden characters', { variant: 'error' });
+            } else {
+                void changeNick();
+            }
         }
     }
 
@@ -47,7 +57,9 @@ export function ChangeNick() {
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '300px'
+                height: '300px',
+                width: '300px',
+                margin: 'auto'
             }}>
             <TextField
                 value={form.userNick}
@@ -55,13 +67,20 @@ export function ChangeNick() {
                 label="Nick"
                 type="text"
                 size="small"
+                inputProps={{ maxLength: 20 }}
+                sx={{
+                    width: '100%',
+                    mb: '10px'
+
+                }}
             ></TextField>
+            <NickValidator nick={form.userNick} />
             <Button
                 type="submit"
                 variant="contained"
                 color="primary"
                 size="large"
-                sx={{ px: 5, mt: 1 }}
+                sx={{ px: 5, mt: 2, width: '100%' }}
             >
                 CHANGE
             </Button>

@@ -1,7 +1,7 @@
 import { Box, Button } from '@mui/material'
 import { useEffect, useState } from 'react';
 import InputPassword from '../InputPassword';
-import PassValidator from '../passValidator';
+import PassValidator from '../validators/PassValidator';
 import { enqueueSnackbar } from 'notistack';
 import { useResetPasswordMutation } from '../../features/api/apiSlice';
 
