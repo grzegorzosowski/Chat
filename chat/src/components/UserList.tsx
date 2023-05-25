@@ -12,18 +12,19 @@ import { Tooltip, Typography } from '@mui/material';
 import { FOOTER_HEIGHT } from './Footer';
 import { useIsMobile } from '../features/useIsMobile';
 import { webSocket } from '../webSocketConfig';
-interface User {
+
+type User = {
   _id: string;
   nick: string;
 }
-interface GroupChat {
+type GroupChat = {
   _id: string;
   chatName: string;
   members: string[];
   membersNick: string[];
 }
 
-interface ResponseData {
+type ResponseData = {
   users: User[];
   groupChats: GroupChat[];
 }
@@ -33,7 +34,7 @@ type Result = {
   chatName: string;
 }
 
-interface Message {
+type Message = {
   messageID: number;
   senderID: string;
   chatID: string;
@@ -53,7 +54,7 @@ export default function UserList(): JSX.Element {
   const [users, setUsers] = useState<User[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
-  const [serverData, setServerData] = useState<Array<string> | undefined>(undefined);
+  const [serverData, setServerData] = useState<Array<string> | null>(null);
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
   const [findGroupChat] = useFindGroupChatMutation();
