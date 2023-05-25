@@ -1,12 +1,10 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useUser } from '../UserProvider';
 import { useEffect, useState } from 'react';
-import { Link, MenuItem } from '@mui/material';
+import { Link, Box } from '@mui/material';
 import { useCreateChatMutation } from '../features/api/apiSlice';
 import { enqueueSnackbar } from 'notistack';
 import { useIsMobile } from '../features/useIsMobile';
@@ -94,7 +92,7 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
 
     return (
         <>
-            <MenuItem onClick={handleOpen} sx={{ m: '0px', p: '0px' }}>Create group chat</MenuItem>
+            <Box onClick={handleOpen} sx={{ m: '0px', p: '0px' }}>Create group chat</Box>
             <Modal
                 open={open}
                 onClose={handleClose}
