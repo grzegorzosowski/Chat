@@ -53,7 +53,7 @@ export default function UserList(): JSX.Element {
   const [users, setUsers] = useState<User[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
-  const [serverData, setServerData] = useState<Array<string> | null>(null);
+  const [serverData, setServerData] = useState<Array<string> | undefined>(undefined);
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
   const [findGroupChat] = useFindGroupChatMutation();
@@ -86,8 +86,7 @@ export default function UserList(): JSX.Element {
       const reader = new FileReader();
       reader.onload = () => {
         const data = reader.result as string;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const serverData: ServerMessage = JSON.parse(data)
+        const serverData = JSON.parse(data) as ServerMessage
         if (serverData.type === 'loggedUsers') {
           setServerData(serverData.content);
           console.log('ZALOGOWANI UŻYTKOWNICY: ', serverData)
