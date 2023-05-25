@@ -18,7 +18,6 @@ export default function MessageBox(): JSX.Element {
             const ws = webSocket;
             console.log('WebSocket: ', ws);
             if (ws) {
-                console.log('Inside if of websocket in message box');
                 const open = () => {
                     console.log('WebSocket connected');
                 }
