@@ -19,7 +19,7 @@ export default function MobileCloseButton({ handleClose }: MobileCloseButtonProp
                 zIndex: '1000',
                 color: 'white',
                 borderRadius: '10px',
-                backgroundColor: '#0f5396',
+                backgroundColor: 'red',
             }}></CloseIcon>
     )
 }
