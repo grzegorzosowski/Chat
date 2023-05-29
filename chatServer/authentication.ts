@@ -12,7 +12,18 @@ export type SerializedUser = {
     verified: boolean;
 };
 
-export function initAuthentication(app: Application) {
+export const isSerializedUser = (obj: any): obj is SerializedUser => {
+    return (
+        obj != null &&
+        typeof obj === 'object' &&
+        obj._id != null &&
+        obj.nick != null &&
+        obj.email != null &&
+        obj.verified != null
+    );
+};
+
+export const initAuthentication = (app: Application) => {
     passport.use(new LocalStrategy(verify));
 
     passport.serializeUser((user, done) => {
@@ -24,7 +35,6 @@ export function initAuthentication(app: Application) {
             verified: theUser.verified,
         };
         process.nextTick(() => {
-            console.log('SERAILIZACJA ZAKONCZONA');
             return done(null, serializedUser);
         });
     });
@@ -40,21 +50,19 @@ export function initAuthentication(app: Application) {
 
     app.use(passport.initialize());
     app.use(passport.session());
-}
+};
 
 const verify = async (
     userEmail: string,
     password: string,
     cb: (err: Error | null, user?: UserType | false) => void
 ) => {
-    console.log('Verify is now working');
     try {
         const user = await User.findOne<UserWithId>({ email: userEmail });
         if (!user) {
             return cb(null, false);
         }
         if (!(await bcrypt.compare(password, user.password))) {
-            console.log('Wrong password');
             return cb(null, false);
         }
 
