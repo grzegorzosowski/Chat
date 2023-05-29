@@ -34,6 +34,16 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
     const [usersFetched, setUsersFetched] = useState<boolean>(false);
     const [createChat] = useCreateChatMutation();
     const handleOpen = () => {
+        function getUsers() {
+            fetch('/api/getUsers', requestOptions)
+                .then((response) => response.json())
+                .then((data: UsersList) => { setUsers(data?.users) })
+                .catch((error) => console.log(error));
+        }
+        if (!usersFetched) {
+            getUsers();
+            setUsersFetched(true);
+        }
         setOpen(true);
         props.closeLeftMenu();
     }
@@ -49,18 +59,6 @@ export default function CreateChatModal(props: FunctionProps): JSX.Element {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nick: user?.nick } as Record<string, unknown>),
     };
-    useEffect(() => {
-        function getUsers() {
-            fetch('/api/getUsers', requestOptions)
-                .then((response) => response.json())
-                .then((data: UsersList) => { setUsers(data?.users) })
-                .catch((error) => console.log(error));
-        }
-        if (!usersFetched) {
-            getUsers();
-            setUsersFetched(true);
-        }
-    }, []);
 
     const handleSubmit = () => {
         if (newChatUsers.length === 0) {
