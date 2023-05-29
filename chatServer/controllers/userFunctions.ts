@@ -1,9 +1,11 @@
-import User, { UserWithId } from '../db/models/User';
+import { SerializedUser } from '../authentication';
+type SessionWithPassport = Express.Request['session'] & {
+    passport?: {
+        user?: SerializedUser;
+    };
+};
 
-export async function findUserByEmail(email: string) {
-    return await User.findOne<UserWithId>({ email: email });
-}
-
-export async function findUserById(id: string) {
-    return User.findById({ _id: id });
+export function getUserFromSession(session: Express.Request['session']) {
+    const passport = (session as SessionWithPassport).passport;
+    return passport?.user;
 }

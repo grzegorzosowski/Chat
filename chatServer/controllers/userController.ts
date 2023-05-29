@@ -6,98 +6,121 @@ import passwordValidation from '../../chat/src/features/validations/passwordVali
 import { nickValidation } from '../../chat/src/features/validations/nickValidation';
 import { emailVerify, verifyToken } from '../lib/emailVerify';
 import { v4 as uuidv4 } from 'uuid';
-import { ObjectId } from 'mongoose';
-import { findUserByEmail, findUserById } from './userFunctions';
+import { getUserFromSession } from './userFunctions';
+import { findUserByEmail, findUserById, updateUser } from '../lib/dbRequestFunctions';
 
 const saltRounds = 12;
 
-declare module 'express-session' {
-    interface Session {
-        passport: any;
-    }
+function isValidEmailAddress(emailAddress: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
+}
+
+function normalizeMail(mail: string) {
+    return mail.toLowerCase().trim();
 }
 
 class UserController {
-    async createUser(req: Request, res: Response) {
+    createUser = async (req: Request, res: Response) => {
         const userNick = req.body.userNick;
         const userEmail = req.body.userEmail;
         const userPassword = req.body.userPassword;
         const passwordValidationResult = passwordValidation(userPassword);
         const { hasLengthCorrect, hasWhiteListChars } = nickValidation(userNick);
-
+        console.log('Creating user...');
         if (!hasLengthCorrect || !hasWhiteListChars) {
             return res.status(422).json({ message: 'Nick is not valid' });
         }
         if (passwordValidationResult.includes(false)) {
             return res.status(422).json({ message: 'Password is not valid' });
         }
-        if (userNick.length < 3) {
-            return res.status(422).json({ message: 'Nick is too short' });
-        }
-        if (userEmail === '' || !userEmail.includes('@')) {
+        if (typeof userEmail !== 'string' || userEmail === '' || !isValidEmailAddress(userEmail)) {
             return res.status(422).json({ message: 'Email is not valid' });
         }
+        const normalizedUserMail = normalizeMail(userEmail);
         try {
-            const checkUserExist = await User.findOne({ email: userEmail });
+            const checkUserExist = await findUserByEmail(normalizedUserMail);
+            console.log('Founded user: ', checkUserExist);
             if (checkUserExist) {
                 return res.status(422).json({ message: 'This email already exists' });
             }
-            const createdUser = await insertUserToDB(userNick, userPassword, userEmail);
+            console.log('Call insertUserToDB function ');
+            const createdUser = await this.insertUserToDB(userNick, userPassword, normalizedUserMail);
             emailVerify(createdUser);
         } catch (err: any) {
             return res.status(422).json({ message: err.message });
         }
         return res.status(201).json('User created successfully');
-    }
+    };
 
-    async resetPassword(req: Request, res: Response) {
-        const userEmail = req.session.passport.user.email;
+    resetPassword = async (req: Request, res: Response) => {
+        const userFromSession = getUserFromSession(req.session);
+        if (!userFromSession) {
+            res.sendStatus(401);
+            return;
+        }
         const oldPassword = req.body.oldPassword;
         const newPassword = req.body.newPassword;
-        const getUser = await User.findOne({ email: userEmail });
-        if (!getUser) {
+        const user = await findUserById(userFromSession._id);
+        if (!user) {
             return res.status(422);
         }
-        if (!(await bcrypt.compare(oldPassword, getUser.password))) {
+        if (!(await bcrypt.compare(oldPassword, user.password))) {
             return res.status(422).json({ message: 'Old password is wrong' });
         }
-        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-        if (await bcrypt.compare(newPassword, getUser.password)) {
-            return res.status(422).json({ message: 'New password is the same as old password' });
-        } else {
-            await User.updateOne({ email: userEmail }, { password: hashedNewPassword });
-            return res.status(200).json({ message: 'Password updated!' });
-        }
-    }
 
-    async changeUserNick(req: Request, res: Response) {
+        const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+        if (await bcrypt.compare(newPassword, user.password)) {
+            return res.status(422).json({ message: 'New password is the same as old password' });
+        }
+
+        await updateUser(user._id, { password: hashedNewPassword });
+        return res.status(200).json({ message: 'Password updated!' });
+    };
+
+    changeUserNick = async (req: Request, res: Response) => {
+        const user = getUserFromSession(req.session);
+        if (!user) {
+            res.sendStatus(401);
+            return;
+        }
         const userNewNick = req.body.userNick;
-        const userID = req.session.passport.user._id;
-        let changedNick = await User.findByIdAndUpdate(userID, { nick: userNewNick }, { new: true });
-        res.status(200).json(changedNick?.nick);
-    }
-    async getUserAccountInfo(req: Request, res: Response) {
-        const user = await findUserById(req.body.userID);
+        const { hasLengthCorrect, hasWhiteListChars } = nickValidation(userNewNick);
+
+        if (!hasLengthCorrect || !hasWhiteListChars) {
+            return res.status(422).json({ message: 'Nick is not valid' });
+        }
+
+        await updateUser(user._id, { nick: userNewNick });
+        res.status(200);
+    };
+    getUserAccountInfo = async (req: Request, res: Response) => {
+        const userFromSession = getUserFromSession(req.session);
+        if (!userFromSession) {
+            res.sendStatus(401);
+            return;
+        }
+        const user = await findUserById(userFromSession._id);
+
         const { lastFailedLogin, lastLogin } = user ?? {};
         const extractedData = {
             lastFailedLogin,
             lastLogin,
         };
         res.status(200).json(extractedData);
-    }
-    async getUserNick(req: Request, res: Response) {
+    };
+    getUserNick = async (req: Request, res: Response) => {
         const userID = req.body.userID;
-        const userNick = await User.findById(userID).select('nick');
-        res.status(200).json(userNick?.nick);
-    }
+        const foundedUser = await findUserById(userID);
+        res.status(200).json(foundedUser?.nick);
+    };
 
-    async getUsers(req: Request, res: Response) {
+    getUsers = async (req: Request, res: Response) => {
         const users = await User.find({ nick: { $ne: req.body.nick } }).select('-password');
         const groupChats = (await Chat.find({ members: req.body._id })).filter((chat: any) => chat.members.length > 2);
         res.json({ users, groupChats });
-    }
+    };
 
-    async emailToken(req: Request, res: Response) {
+    emailToken = async (req: Request, res: Response) => {
         const { token } = req.query;
         if (typeof token !== 'string') {
             res.redirect(`/?bad-request`);
@@ -115,45 +138,35 @@ class UserController {
             if (user.verifyToken !== payload.verifyToken) {
                 return;
             }
+            await updateUser(user._id, { verified: true });
 
-            await User.updateOne(
-                { _id: user._id },
-                {
-                    verified: true,
-                }
-            );
             const redirectURL = 'http://localhost:3000/emailConfirmed';
             return res.redirect(redirectURL);
         } catch (error: any) {
             console.error(error);
             res.redirect(`/?unexpected-error`);
         }
-    }
-    async updateUser(id: string | ObjectId, update: Partial<UserType>) {
-        return await User.updateOne({ _id: id }, { $set: update });
-    }
+    };
 
-    async getUserByEmail(email: string) {
-        return await User.findOne({ email });
-    }
+    private insertUserToDB = async (nick: string, password: string, email: string): Promise<UserWithId> => {
+        console.log('Inserting user to DB...');
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const newUser = new User<UserType>({
+            nick: nick,
+            email: email,
+            password: hashedPassword,
+            verifyToken: uuidv4(),
+            verified: false,
+            registerAt: new Date().toISOString(),
+        });
+        await newUser.save().then(() => {});
+        console.log('User has been saved');
+        const createdUser = await findUserByEmail(newUser.email);
+        if (!createdUser) {
+            throw new Error();
+        }
+        return createdUser;
+    };
 }
 
 export = new UserController();
-
-async function insertUserToDB(nick: string, password: string, email: string): Promise<UserWithId> {
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const newUser = new User<UserType>({
-        nick: nick,
-        email: email,
-        password: hashedPassword,
-        verifyToken: uuidv4(),
-        verified: false,
-        registerAt: new Date().toISOString(),
-    });
-    await newUser.save().then(() => {});
-    const createdUser = await findUserByEmail(newUser.email);
-    if (!createdUser) {
-        throw new Error();
-    }
-    return createdUser;
-}
