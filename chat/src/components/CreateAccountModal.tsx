@@ -9,15 +9,21 @@ import { useCreateAccountMutation } from '../features/api/apiSlice';
 import { useSnackbar } from 'notistack';
 import PassValidator from './validators/PassValidator';
 import { useIsMobile } from '../features/useIsMobile';
-import MobileCloseButton from './MobileView/MobileCloseButton';
 import { useTheme } from '@mui/material';
 import NickValidator from './validators/NickValidator';
 import { isNickValid } from '../features/validations/nickValidation';
-interface FormState {
+type FormState = {
     userEmail: string;
     userNick: string;
     userPassword: string;
     userPasswordRepeat: string;
+}
+
+type Error = {
+    data: string,
+    error: string,
+    originalStatus: number,
+    status: string,
 }
 
 export function CreateAccountModal() {
@@ -47,9 +53,13 @@ export function CreateAccountModal() {
                 enqueueSnackbar('Account has been created', { variant: 'success' });
                 handleClose();
             })
-            .catch((error) => {
+            .catch((error: Error) => {
                 console.log(error);
-                enqueueSnackbar('Account has not been created ', { variant: 'error' });
+                if (error.originalStatus === 429) {
+                    enqueueSnackbar('Too many requests', { variant: 'error' });
+                } else {
+                    enqueueSnackbar('Account has not been created ', { variant: 'error' });
+                }
             })
     }
 
@@ -81,7 +91,6 @@ export function CreateAccountModal() {
                 }}>Create account</Button>
             <Modal
                 open={open}
-                onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
@@ -97,7 +106,7 @@ export function CreateAccountModal() {
                     borderRadius: '5px',
                     backgroundColor: theme.palette.mode === 'dark' ? 'rgba(12, 12, 12, 0.9)' : 'rgba(255, 255, 255, 0.9)',
                 })}>
-                    {isMobile && <MobileCloseButton handleClose={setOpen}></MobileCloseButton>}
+                    {/* <MobileCloseButton handleClose={setOpen}></MobileCloseButton> */}
                     <Box component='form' onSubmit={handleSubmit} sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -133,26 +142,42 @@ export function CreateAccountModal() {
                             }}
                         ></TextField>
                         <InputPassword
+                            id='password'
                             value={form.userPassword}
                             onChange={(event) => setForm({ ...form, userPassword: event.target.value })}
                             text={'Password'}
                         ></InputPassword>
                         <InputPassword
+                            id='rPassword'
                             value={form.userPasswordRepeat}
                             onChange={(event) => setForm({ ...form, userPasswordRepeat: event.target.value })}
-                            text={'Password'}
+                            text={'Repeat Password'}
                         ></InputPassword>
                         <NickValidator nick={form.userNick} />
                         <PassValidator password={form.userPassword} passwordCorrect={setValidationDone}></PassValidator>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            sx={{ px: 5, mt: 1 }}
-                        >
-                            CREATE
-                        </Button>
+                        <Box sx={{
+                            width: '90%',
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                        }}>
+                            <Button
+                                variant='outlined'
+                                size="large"
+                                onClick={() => handleClose()}
+                                sx={{ px: 5, mt: 1 }}
+                            >
+                                CANCEL
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                size="large"
+                                sx={{ px: 5, mt: 1 }}
+                            >
+                                CREATE
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
 
