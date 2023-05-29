@@ -90,7 +90,6 @@ export default function UserList(): JSX.Element {
         const serverData = JSON.parse(data) as ServerMessage
         if (serverData.type === 'loggedUsers') {
           setServerData(serverData.content);
-          console.log('ZALOGOWANI UŻYTKOWNICY: ', serverData)
         }
       }
       reader.readAsText(event.data)
