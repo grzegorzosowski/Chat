@@ -30,9 +30,10 @@ export default function LoginPage() {
       try {
         const res = await fetch('api/login/password', requestOptions);
         console.log('STATUS', res.status);
-        const success = res.status === 200;
-        if (success) {
+        if (res.status === 200) {
           window.location.replace('/chat');
+        } else if (res.status === 429) {
+          enqueueSnackbar('Too many requests', { variant: 'error' });
         } else {
           enqueueSnackbar('Wrong password', { variant: 'error' });
         }
