@@ -17,7 +17,7 @@ type ConnectedClients = {
 
 type ServerMessage = {
     type: string;
-    content: any;
+    content: string[] | MessagesType;
 };
 
 function pushConnection(obj: ConnectedClients, userId: mongoose.ObjectId, socket: WebSocket) {
@@ -121,7 +121,7 @@ export default function initWebSocket(app: Application) {
         };
         const messageBytes = Buffer.from(JSON.stringify(message));
         for (const connectedClient in connectedClients) {
-            if (connectedClients.hasOwnProperty(connectedClient)) {
+            if (connectedClient in connectedClients) {
                 const webSockets = connectedClients[connectedClient];
                 webSockets.map((socket) => {
                     socket.send(messageBytes);
