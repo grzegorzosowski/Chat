@@ -1,12 +1,10 @@
-import session from "express-session"
-require("dotenv").config();
-
-const secret = process.env.SECRET || "default-secret-key";
-const oneDay = 1000 * 60 * 60 * 24;
+import session from 'express-session';
+require('dotenv').config();
+import { secret, cookieMaxAge } from './config';
 
 export const sessionMiddleware = session({
     secret: secret,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: oneDay, secure: false },
-  })
+    cookie: { maxAge: cookieMaxAge, secure: false },
+});
