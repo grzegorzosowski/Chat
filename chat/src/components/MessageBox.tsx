@@ -16,7 +16,6 @@ export default function MessageBox(): JSX.Element {
     useEffect(() => {
         if (user) {
             const ws = webSocket;
-            console.log('WebSocket: ', ws);
             if (ws) {
                 const open = () => {
                     console.log('WebSocket connected');
