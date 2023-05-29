@@ -56,73 +56,78 @@ type ChangePassword = {
 
 export const apiSlice = createApi({
     reducerPath: 'api',
-    baseQuery: fetchBaseQuery({ baseUrl: '/' }),
+    baseQuery: fetchBaseQuery({ baseUrl: '/api/' }),
     endpoints: (builder) => ({
+        getAuthUser: builder.query({
+            query: () => ({
+                url: `user`,
+            }),
+        }),
         findChat: builder.mutation({
             query: (chat: Chat) => ({
-                url: `api/findChat`,
+                url: `findChat`,
                 method: 'POST',
                 body: chat,
             }),
         }),
         findGroupChat: builder.mutation({
             query: (chat: GroupChat) => ({
-                url: `api/findGroupChat`,
+                url: `findGroupChat`,
                 method: 'POST',
                 body: chat,
             }),
         }),
         getMessages: builder.mutation({
             query: (chatID: ChatID) => ({
-                url: `api/getMessages`,
+                url: `getMessages`,
                 method: 'POST',
                 body: chatID,
             }),
         }),
         getUserNick: builder.mutation({
             query: (userID: UserID) => ({
-                url: `api/getUserNick`,
+                url: `getUserNick`,
                 method: 'POST',
                 body: userID,
             }),
         }),
         createChat: builder.mutation({
             query: (chatParam: CreateChat) => ({
-                url: `api/createChat`,
+                url: `createChat`,
                 method: 'POST',
                 body: chatParam,
             }),
         }),
         createAccount: builder.mutation({
             query: (accountParam: CreateAccount) => ({
-                url: `api/createAccount`,
+                url: `createAccount`,
                 method: 'POST',
                 body: accountParam,
             }),
         }),
         changeAccountNick: builder.mutation({
             query: (accountParam: ChangeAccount) => ({
-                url: `api/changeAccountNick`,
+                url: `changeAccountNick`,
                 method: 'POST',
                 body: accountParam,
             }),
         }),
         getUserAccountInfo: builder.mutation({
             query: (userID: UserID) => ({
-                url: 'api/getUserAccountInfo',
+                url: 'getUserAccountInfo',
                 method: 'POST',
                 body: userID,
             }),
         }),
         logoutUser: builder.mutation({
             query: () => ({
-                url: 'api/logout',
+                url: 'logout',
                 method: 'POST',
             }),
         }),
         resetPassword: builder.mutation({
             query: (passwords: ChangePassword) => ({
-                url: 'api/resetPassword',
+                url: 'resetPassword',
                 method: 'POST',
                 body: passwords,
             }),
@@ -131,6 +136,7 @@ export const apiSlice = createApi({
 });
 
 export const {
+    useGetAuthUserQuery,
     useFindChatMutation,
     useGetMessagesMutation,
     useGetUserNickMutation,
