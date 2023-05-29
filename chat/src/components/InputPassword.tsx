@@ -31,7 +31,7 @@ export default function InputPassword({ text, id, onChange, name, label }: Input
                 {text}
             </InputLabel>
             <OutlinedInput
-                id="outlined-adornment-password"
+                id={id}
                 aria-label='password'
                 data-testid="password"
                 type={showPassword ? 'text' : 'password'}
