@@ -1,10 +1,7 @@
 import { Router } from 'express';
 import UserController from '../controllers/userController';
 import ChatController from '../controllers/chatController';
-import passport from 'passport';
-import { UserWithId } from '../db/models/User';
-import { isSerializedUser, loggedIn, login, logout, sendUser } from '../authentication';
-import { findUserByEmail, updateUser } from '../lib/dbRequestFunctions';
+import { loggedIn, login, logout, sendUser } from '../authentication';
 
 const router = Router();
 router.get('/', (_req, res) => {
