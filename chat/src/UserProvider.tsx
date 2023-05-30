@@ -1,5 +1,8 @@
 import React from 'react';
 import { useContext, useEffect, useState, createContext } from 'react';
+import LoadingPage from './components/LoadingPage';
+import { useGetAuthUserQuery } from './features/api/apiSlice'
+import { error } from 'console';
 
 export type User = {
     _id: string;
@@ -14,7 +17,7 @@ export function useUser() {
     return useContext(Context);
 }
 
-interface UserProviderType {
+type UserProviderType = {
     children: React.ReactNode
 }
 
@@ -22,27 +25,26 @@ export function UserProvider({ children }: UserProviderType) {
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<User | undefined>();
 
-
+    //const authUser = useGetAuthUserQuery({}).data as User
+    //useEffect to check by Chris
     useEffect(() => {
-        setIsLoading(true);
+        // setIsLoading(true);
+        // setUser(authUser)
+        // setIsLoading(false)
+
         fetch('api/user', { method: 'GET' })
             .then((res) => res.json() as Promise<User>)
             .then((user) => {
                 setUser(user);
             })
-
-            .catch((err) => {
-                console.warn('User fetch error', err);
+            .catch(() => {
+                setUser(undefined)
             })
             .finally(() => setIsLoading(false));
     }, []);
 
-    useEffect(() => {
-        console.log('USER', user);
-    }, [user]);
-
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <LoadingPage />;
     }
 
     return <Context.Provider value={user}>{children}</Context.Provider>;
