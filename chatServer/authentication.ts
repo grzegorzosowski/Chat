@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
 import './db/mongoose';
 import User, { UserType, UserWithId } from './db/models/User';
-import { Application } from 'express';
+import { Application, Request, Response } from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
+import { findUserByEmail, updateUser } from './lib/dbRequestFunctions';
 
 export type SerializedUser = {
     _id: string;
@@ -70,4 +71,73 @@ const verify = async (
     } catch (err) {
         return cb(err as any);
     }
+};
+
+export const sendUser = (req: Request, res: Response) => {
+    const serializedUser = req.user;
+    if (isSerializedUser(serializedUser)) {
+        const userToSend = {
+            _id: serializedUser._id,
+            nick: serializedUser.nick,
+            email: serializedUser.email,
+            verified: serializedUser.verified,
+        };
+        res.send(userToSend);
+    } else {
+        res.sendStatus(401).json({ message: 'Unauthorized' });
+    }
+};
+
+export const loggedIn = (req: any, res: any, next: any) => {
+    if (req.user) {
+        req.session.user = req.user;
+        next();
+    } else {
+        res.sendStatus(401);
+    }
+};
+
+export const login = (req: Request, res: Response, next: any) => {
+    passport.authenticate('local', async function (err: any, user: UserWithId) {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            //If passport could not authenticate user, 'user' variable is empty
+            const userFailedLoginAttempt = await findUserByEmail(req.body.username);
+            if (!userFailedLoginAttempt) {
+                return res.sendStatus(401);
+            }
+            updateUser(userFailedLoginAttempt._id.toString(), {
+                lastFailedLogin: {
+                    timestamp: new Date().toISOString(),
+                    ip: req.socket.remoteAddress ?? '',
+                    userAgent: req.headers['user-agent'] ?? '',
+                },
+            });
+            return res.sendStatus(401);
+        }
+
+        req.logIn(user, function (loginErr) {
+            if (loginErr) {
+                return next(loginErr);
+            }
+            updateUser(user._id.toString(), {
+                lastLogin: {
+                    timestamp: new Date().toISOString(),
+                    ip: req.socket.remoteAddress ?? '',
+                },
+            });
+            return res.send(user);
+        });
+    })(req, res, next);
+};
+
+export const logout = (req: Request, res: Response, next: any) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.sendStatus(200);
+    });
 };
