@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import './db/mongoose';
-import User, { UserType, UserWithId } from './db/models/User';
+import { UserType, UserWithId } from './db/models/User';
 import { Application, Request, Response } from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { findUserByEmail, updateUser } from './lib/dbRequestFunctions';
+import { normalizeMail } from './controllers/userFunctions';
 
 export type SerializedUser = {
     _id: string;
@@ -32,7 +33,7 @@ export const initAuthentication = (app: Application) => {
         const serializedUser = {
             _id: theUser._id,
             nick: theUser.nick,
-            email: theUser.email,
+            email: normalizeMail(theUser.email),
             verified: theUser.verified,
         };
         process.nextTick(() => {
@@ -40,9 +41,9 @@ export const initAuthentication = (app: Application) => {
         });
     });
 
-    passport.deserializeUser(async (baseUser: UserType, done) => {
+    passport.deserializeUser(async (baseUser: UserWithId, done) => {
         try {
-            const user = await User.findOne({ email: baseUser.email });
+            const user = await findUserByEmail(baseUser.email);
             done(undefined, user);
         } catch (err) {
             done(err, undefined);
@@ -59,7 +60,7 @@ const verify = async (
     cb: (err: Error | null, user?: UserType | false) => void
 ) => {
     try {
-        const user = await User.findOne<UserWithId>({ email: userEmail });
+        const user = await findUserByEmail(userEmail);
         if (!user) {
             return cb(null, false);
         }
@@ -79,7 +80,7 @@ export const sendUser = (req: Request, res: Response) => {
         const userToSend = {
             _id: serializedUser._id,
             nick: serializedUser.nick,
-            email: serializedUser.email,
+            email: normalizeMail(serializedUser.email),
             verified: serializedUser.verified,
         };
         res.send(userToSend);
@@ -93,7 +94,7 @@ export const loggedIn = (req: any, res: any, next: any) => {
         req.session.user = req.user;
         next();
     } else {
-        res.sendStatus(401);
+        res.sendStatus(204);
     }
 };
 
