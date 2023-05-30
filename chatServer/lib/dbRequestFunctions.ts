@@ -2,9 +2,11 @@ import { Types } from 'mongoose';
 import User, { UserType, UserWithId } from '../db/models/User';
 import Chat from '../db/models/Chat';
 import Messages from '../db/models/Messages';
+import { normalizeMail } from '../controllers/userFunctions';
 
 export function findUserByEmail(email: string) {
-    return User.findOne<UserWithId>({ email: email });
+    const normalizedEmail = normalizeMail(email);
+    return User.findOne<UserWithId>({ email: normalizedEmail });
 }
 
 export function findUserById(id: string) {
