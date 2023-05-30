@@ -6,18 +6,10 @@ import passwordValidation from '../../chat/src/features/validations/passwordVali
 import { nickValidation } from '../../chat/src/features/validations/nickValidation';
 import { emailVerify, verifyToken } from '../lib/emailVerify';
 import { v4 as uuidv4 } from 'uuid';
-import { getUserFromSession } from './userFunctions';
+import { getUserFromSession, isValidEmailAddress, normalizeMail } from './userFunctions';
 import { findUserByEmail, findUserById, updateUser } from '../lib/dbRequestFunctions';
 
 const saltRounds = 12;
-
-function isValidEmailAddress(emailAddress: string) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
-}
-
-function normalizeMail(mail: string) {
-    return mail.toLowerCase().trim();
-}
 
 class UserController {
     createUser = async (req: Request, res: Response) => {
@@ -36,15 +28,15 @@ class UserController {
         if (typeof userEmail !== 'string' || userEmail === '' || !isValidEmailAddress(userEmail)) {
             return res.status(422).json({ message: 'Email is not valid' });
         }
-        const normalizedUserMail = normalizeMail(userEmail);
         try {
-            const checkUserExist = await findUserByEmail(normalizedUserMail);
+            const checkUserExist = await findUserByEmail(userEmail);
             console.log('Founded user: ', checkUserExist);
             if (checkUserExist) {
                 return res.status(422).json({ message: 'This email already exists' });
             }
             console.log('Call insertUserToDB function ');
-            const createdUser = await this.insertUserToDB(userNick, userPassword, normalizedUserMail);
+            const normalizedEmail = normalizeMail(userEmail);
+            const createdUser = await this.insertUserToDB(userNick, userPassword, normalizedEmail);
             emailVerify(createdUser);
         } catch (err: any) {
             return res.status(422).json({ message: err.message });
