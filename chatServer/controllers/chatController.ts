@@ -93,7 +93,6 @@ class ChatController {
             return;
         }
         const messages = await findMessagesByChatId(chatId);
-        console.log('Founded messages: ', messages);
         res.json(messages);
     }
 }

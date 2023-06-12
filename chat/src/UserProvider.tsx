@@ -2,7 +2,6 @@ import React from 'react';
 import { useContext, useEffect, useState, createContext } from 'react';
 import LoadingPage from './components/LoadingPage';
 import { useGetAuthUserQuery } from './features/api/apiSlice'
-import { error } from 'console';
 
 export type User = {
     _id: string;
