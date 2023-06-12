@@ -107,7 +107,7 @@ class UserController {
     };
 
     getUsers = async (req: Request, res: Response) => {
-        const users = await User.find({ nick: { $ne: req.body.nick } }).select('-password');
+        const users = await User.find({ nick: { $ne: req.body.nick } }).select('_id, nick');
         const groupChats = (await Chat.find({ members: req.body._id })).filter((chat: any) => chat.members.length > 2);
         res.json({ users, groupChats });
     };
