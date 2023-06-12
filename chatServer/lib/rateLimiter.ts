@@ -9,7 +9,7 @@ export const standardRateLimiter = rateLimit({
 
 export const loginRateLimiter = rateLimit({
     windowMs: 60 * 1000 * 5, // 5min
-    max: 3,
+    max: 5,
     standardHeaders: true,
     store: new MemoryStore(),
 });
