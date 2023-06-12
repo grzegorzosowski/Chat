@@ -109,7 +109,7 @@ export const login = (req: Request, res: Response, next: any) => {
             if (!userFailedLoginAttempt) {
                 return res.sendStatus(401);
             }
-            updateUser(userFailedLoginAttempt._id.toString(), {
+            await updateUser(userFailedLoginAttempt._id.toString(), {
                 lastFailedLogin: {
                     timestamp: new Date().toISOString(),
                     ip: req.socket.remoteAddress ?? '',
@@ -119,11 +119,12 @@ export const login = (req: Request, res: Response, next: any) => {
             return res.sendStatus(401);
         }
 
-        req.logIn(user, function (loginErr) {
+        req.logIn(user, async function (loginErr) {
             if (loginErr) {
                 return next(loginErr);
             }
-            updateUser(user._id.toString(), {
+            console.log('Updating User lastLogin: ', user);
+            await updateUser(user._id.toString(), {
                 lastLogin: {
                     timestamp: new Date().toISOString(),
                     ip: req.socket.remoteAddress ?? '',
