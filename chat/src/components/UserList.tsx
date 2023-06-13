@@ -58,7 +58,7 @@ export default function UserList(): JSX.Element {
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
   const [findGroupChat] = useFindGroupChatMutation();
-
+  const ws = webSocket;
 
   const requestOptions = {
     method: 'POST',
@@ -66,23 +66,24 @@ export default function UserList(): JSX.Element {
     body: JSON.stringify({ nick: user?.nick, _id: user?._id } as Record<string, unknown>),
   };
   useEffect(() => {
-
-    const ws = webSocket;
-    ws.send(JSON.stringify('getUsers'))
     function getUsers() {
       fetch('/api/getUsers', requestOptions)
         .then((response) => response.json())
         .then((data: ResponseData) => { setGroupChats(data.groupChats); setUsers(data.users) })
         .catch((error) => console.log(error));
     }
+    ws.addEventListener('open', function () {
+      ws.send(JSON.stringify('getUsers'))
+    });
+
     if (!usersFetched) {
       getUsers();
       setUsersFetched(true);
     }
+
   }, []);
 
   useEffect(() => {
-    const ws = webSocket;
     const onMessage = (event: MessageEvent<Blob>) => {
       const reader = new FileReader();
       reader.onload = () => {
