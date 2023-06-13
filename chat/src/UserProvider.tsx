@@ -12,7 +12,9 @@ type UserProviderType = {
 }
 
 export function UserProvider({ children }: UserProviderType) {
-    const { isLoading } = useGetAuthUserQuery();
+    const { isLoading } = useGetAuthUserQuery(undefined, {
+        skip: true, // Disable auto-refetching for this query
+    });
 
     if (isLoading) {
         return <LoadingCircle />;
