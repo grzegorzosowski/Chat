@@ -1,10 +1,13 @@
-import UserList from './UserList'
-import ChatWindow from './ChatWindow'
-import MessageBox from './MessageBox'
+
 import { useIsMobile } from '../features/useIsMobile'
-import MobileView from './MobileView/MobileView'
 import { Box } from '@mui/material'
 import { FOOTER_HEIGHT } from './Footer'
+import { lazy } from 'react'
+
+const UserList = lazy(() => import('./UserList'));
+const ChatWindow = lazy(() => import('./ChatWindow'));
+const MessageBox = lazy(() => import('./MessageBox'));
+const MobileView = lazy(() => import('./MobileView/MobileView'));
 
 export default function ChatPage() {
     const isMobile = useIsMobile();
