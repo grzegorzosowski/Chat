@@ -1,15 +1,4 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { PayloadAction } from '@reduxjs/toolkit';
-
-interface ChatData {
-    chatID: string;
-    chatName: string;
-    members: Array<string>;
-}
-
-interface FindChatResponse {
-    data: ChatData;
-}
 
 interface Chat {
     id1: string;
@@ -54,11 +43,18 @@ type ChangePassword = {
     newPassword: string;
 };
 
+export type UserDto = {
+    _id: string;
+    nick: string;
+    email: string;
+    verified: boolean;
+};
+
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({ baseUrl: '/api/' }),
     endpoints: (builder) => ({
-        getAuthUser: builder.query({
+        getAuthUser: builder.query<UserDto, void>({
             query: () => ({
                 url: `user`,
             }),
@@ -148,6 +144,3 @@ export const {
     useLogoutUserMutation,
     useResetPasswordMutation,
 } = apiSlice;
-
-type FindChatResult = ReturnType<typeof useFindChatMutation>;
-type FindChatData = FindChatResult extends Promise<PayloadAction<FindChatResponse>> ? ChatData : unknown;
