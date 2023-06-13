@@ -123,7 +123,6 @@ export const login = (req: Request, res: Response, next: any) => {
             if (loginErr) {
                 return next(loginErr);
             }
-            console.log('Updating User lastLogin: ', user);
             await updateUser(user._id.toString(), {
                 lastLogin: {
                     timestamp: new Date().toISOString(),
