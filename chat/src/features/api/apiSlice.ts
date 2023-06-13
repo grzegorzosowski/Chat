@@ -1,46 +1,51 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-interface Chat {
+type Chat = {
     id1: string;
     id2: string;
     nick1: string;
     nick2: string;
-}
+};
 
-interface GroupChat {
+type GroupChat = {
     groupChatID: string;
-}
+};
 
-interface ChatID {
+type ChatID = {
     chatID: string;
-}
-interface User {
-    _id: string;
-    nick: string;
-}
-interface CreateChat {
+};
+type User = {
+    _id: string | undefined;
+    nick: string | undefined;
+};
+type CreateChat = {
     chatName: string;
     members: Array<User>;
     createdBy: string;
-}
+};
 
-interface CreateAccount {
+type CreateAccount = {
     userEmail: string;
     userNick: string;
     userPassword: string;
-}
+};
 
-interface ChangeAccount {
+type ChangeAccount = {
     userNick: unknown;
-}
+};
 
-interface UserID {
+type UserID = {
     userID: string;
-}
+};
 
 type ChangePassword = {
     oldPassword: string;
     newPassword: string;
+};
+
+type LoginCredential = {
+    username: string;
+    password: string;
 };
 
 export type UserDto = {
@@ -57,6 +62,13 @@ export const apiSlice = createApi({
         getAuthUser: builder.query<UserDto, void>({
             query: () => ({
                 url: `user`,
+            }),
+        }),
+        loginUser: builder.mutation({
+            query: (body: LoginCredential) => ({
+                url: 'login/password',
+                method: 'POST',
+                body: body,
             }),
         }),
         findChat: builder.mutation({
@@ -108,6 +120,13 @@ export const apiSlice = createApi({
                 body: accountParam,
             }),
         }),
+        getUsers: builder.mutation({
+            query: (body: User) => ({
+                url: 'getUsers',
+                method: 'POST',
+                body: body,
+            }),
+        }),
         getUserAccountInfo: builder.mutation({
             query: (userID: UserID) => ({
                 url: 'getUserAccountInfo',
@@ -133,9 +152,11 @@ export const apiSlice = createApi({
 
 export const {
     useGetAuthUserQuery,
+    useLoginUserMutation,
     useFindChatMutation,
     useGetMessagesMutation,
     useGetUserNickMutation,
+    useGetUsersMutation,
     useCreateChatMutation,
     useFindGroupChatMutation,
     useCreateAccountMutation,
