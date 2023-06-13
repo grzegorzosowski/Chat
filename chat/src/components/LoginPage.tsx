@@ -5,31 +5,29 @@ import { TextField } from '@mui/material';
 import InputPassword from './InputPassword';
 import Button from '@mui/material/Button'
 import { useIsMobile } from '../features/useIsMobile';
+import { useLoginUserMutation } from '../features/api/apiSlice';
 
-interface FormState {
+type FormState = {
   userEmail: string;
   userPassword: string;
 }
 
+type IncomingData = {
+  status: number;
+  data: object;
+}
+
 export default function LoginPage() {
   const { enqueueSnackbar } = useSnackbar();
+  const [loginUser] = useLoginUserMutation();
 
   const handleSubmit = (email: string, password: string) => {
-    const send = async () => {
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: email,
-          password: password,
-        }),
-      };
 
-      try {
-        const res = await fetch('api/login/password', requestOptions);
-        console.log('STATUS', res.status);
+    loginUser({ username: email, password: password })
+      .unwrap()
+      .then((result: IncomingData) => {
+        const res = result; // Extract the data from the result object
+        console.log('Response', res);
         if (res.status === 200) {
           window.location.replace('/chat');
         } else if (res.status === 429) {
@@ -37,14 +35,13 @@ export default function LoginPage() {
         } else {
           enqueueSnackbar('Wrong password', { variant: 'error' });
         }
-      } catch (error) {
+      })
+      .catch((error) => {
         console.error(error);
-      }
-    }
-    send().catch(e => console.warn(e))
+      });
   };
 
-  return <LoginForm handleSubmit={handleSubmit} />
+  return <LoginForm handleSubmit={handleSubmit} />;
 }
 
 export function LoginForm({ handleSubmit }: { handleSubmit: (email: string, password: string) => void }) {
