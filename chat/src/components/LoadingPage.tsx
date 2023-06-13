@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import LoadingCircle from './LoadingCircle'
 
-export default function Siemanko() {
+export default function LoadingPage() {
     return (
         <Box sx={{
             width: '100%',

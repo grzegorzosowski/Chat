@@ -1,5 +1,5 @@
 import { Box, Tooltip, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { webSocket } from '../webSocketConfig'
 import { useAppSelector, useAppDispatch } from '../hooks';
 import { useUser } from '../UserProvider';
@@ -21,7 +21,69 @@ type ServerMessage = {
   content: MessageData;
 };
 
+function isServerMessage(obj: unknown): obj is ServerMessage {
+  if (obj == null || typeof obj !== 'object') {
+    return false;
+  }
+  const msg = obj as ServerMessage
+  return msg.content != null && typeof msg.type === 'string';
+}
 
+function blobToString(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsText(blob);
+  });
+}
+
+function useChatConnection() {
+  const dispatch = useAppDispatch();
+  const message = useAppSelector((state) => state.messages.messages)
+  const activeChat = useAppSelector((state) => state.activeChat.activeChat);
+
+  const handleNewMessage = useCallback((data: string) => {
+    const serverData: unknown = JSON.parse(data)
+    if (!isServerMessage(serverData)) {
+      console.error("Incorrect server data");
+      return;
+    }
+
+    if (serverData.type === 'message') {
+      if (serverData.content.chatID === activeChat.chatID) {
+        dispatch(addMessage({
+          messageID: serverData.content.messageID,
+          senderID: serverData.content.senderID,
+          chatID: serverData.content.chatID,
+          message: serverData.content?.message,
+          timestamp: new Date(serverData.content?.timestamp).getTime(),
+        }))
+      }
+    }
+  }, [dispatch, activeChat])
+
+  useEffect(() => {
+    const ws = webSocket;
+
+    const onOpen = () => {
+      console.log('WebSocket connected');
+    }
+    ws.addEventListener('open', onOpen);
+
+    const onMessage = (event: MessageEvent<Blob>) => {
+      blobToString(event.data)
+        .then(str => handleNewMessage(str))
+        .catch(err => console.error(err));
+    }
+    ws.addEventListener('message', onMessage);
+    return () => {
+      ws.removeEventListener('open', onOpen);
+      ws.removeEventListener('message', onMessage)
+    };
+
+  }, [dispatch, message]);
+}
 
 export default function ChatWindow(): JSX.Element {
   const user = useUser();
@@ -31,45 +93,16 @@ export default function ChatWindow(): JSX.Element {
   const activeChat = useAppSelector((state) => state.activeChat.activeChat);
   const gettingChat = useAppSelector((state) => state.activeChat.gettingChat);
   const [getUserNick] = useGetUserNickMutation();
-  const dispatch = useAppDispatch();
+
+  useChatConnection()
+
   useEffect(() => {
-    const ws = webSocket;
+    //scroll down when new message comes
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
+  }, [message])
 
-    const open = () => {
-      console.log('WebSocket connected');
-    }
-    ws.addEventListener('open', open);
-
-    const onMessage = (event: MessageEvent<Blob>) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const data = reader.result as string;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const serverData: ServerMessage = JSON.parse(data)
-        if (serverData.type === 'message') {
-          if (serverData.content.chatID === activeChat.chatID) {
-            dispatch(addMessage({
-              messageID: serverData.content.messageID,
-              senderID: serverData.content.senderID,
-              chatID: serverData.content.chatID,
-              message: serverData.content?.message,
-              timestamp: new Date(serverData.content?.timestamp).getTime(),
-            }))
-          }
-        }
-      }
-      reader.readAsText(event.data)
-    }
-    ws.addEventListener('message', onMessage);
-    return () => {
-      ws.removeEventListener('open', open);
-      ws.removeEventListener('message', onMessage)
-    };
-
-  }, [dispatch, message]);
 
   const onTooltipOpen = async (data: string) => {
     setUserNick('');
