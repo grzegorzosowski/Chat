@@ -5,7 +5,7 @@ import User from './User'
 import Link from '@mui/material/Link';
 import { useAppDispatch } from '../hooks';
 import { setActiveChat, setGettingChat } from '../features/chats/chatsSlice';
-import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation } from '../features/api/apiSlice';
+import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation, useGetUsersMutation } from '../features/api/apiSlice';
 import { putMessages } from '../features/messages/messagesSlice';
 import GroupChat from './GroupChat';
 import { Tooltip, Typography } from '@mui/material';
@@ -58,29 +58,30 @@ export default function UserList(): JSX.Element {
   const [findChat] = useFindChatMutation();
   const [getMessages] = useGetMessagesMutation();
   const [findGroupChat] = useFindGroupChatMutation();
+  const [getUsersList] = useGetUsersMutation();
   const ws = webSocket;
 
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nick: user?.nick, _id: user?._id } as Record<string, unknown>),
-  };
   useEffect(() => {
-    function getUsers() {
-      fetch('/api/getUsers', requestOptions)
-        .then((response) => response.json())
-        .then((data: ResponseData) => { setGroupChats(data.groupChats); setUsers(data.users) })
-        .catch((error) => console.log(error));
+    const getUsers = async () => {
+      await getUsersList({ _id: user?._id, nick: user?.nick })
+        .unwrap()
+        .then((res: ResponseData) => {
+          setGroupChats(res.groupChats);
+          setUsers(res.users)
+        })
+        .catch((err) => {
+          console.error(err)
+        })
     }
+
     ws.addEventListener('open', function () {
       ws.send(JSON.stringify('getUsers'))
     });
 
     if (!usersFetched) {
-      getUsers();
+      void getUsers();
       setUsersFetched(true);
     }
-
   }, []);
 
   useEffect(() => {
