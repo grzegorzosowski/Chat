@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { useUser } from '../../UserProvider';
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { useGetUserAccountInfoMutation } from '../../features/api/apiSlice';
@@ -26,9 +26,9 @@ type TableData = {
 export default function ProfileInfo() {
     const user = useUser();
     const isMobile = useIsMobile();
-    const [loginInfo, setLoginInfo] = React.useState<LoginInfo>()
+    const [loginInfo, setLoginInfo] = useState<LoginInfo>()
     const [getUserAccInfo] = useGetUserAccountInfoMutation()
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchData = async () => {
             if (!user) {
                 console.log('asd')
