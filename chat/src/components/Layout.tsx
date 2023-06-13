@@ -1,19 +1,8 @@
 import NavBar from './NavBar'
-import { Box, Link } from '@mui/material'
-import { useUser } from '../UserProvider';
-import { Route, Routes } from 'react-router-dom';
-import { ProtectedRoute } from './ProtectedRoute';
-import LoginPage from './LoginPage';
-import ChatPage from './ChatPage';
-import ErrorPage from './ErrorPage/ErrorPage';
+import { Box } from '@mui/material'
 import Footer, { FOOTER_HEIGHT } from './Footer';
-import Profile from './Profile/Profile';
 
-
-
-export default function Layout() {
-    const user = useUser();
-    const isUser = !!user;
+export default function Layout({ children }: React.PropsWithChildren<unknown>) {
     return (
         <>
             <Box sx={{ minHeight: `calc(100vh - ${FOOTER_HEIGHT}px)` }}>
@@ -22,35 +11,7 @@ export default function Layout() {
                 </header>
                 <main>
                     <Box>
-                        <Routes>
-                            <Route path='/' element={
-                                <ProtectedRoute isUser={!isUser} redirectPath={'/chat'} >
-                                    <LoginPage />
-                                </ProtectedRoute>}
-                            />
-                            <Route path='/chat' element={
-                                <ProtectedRoute isUser={isUser}>
-                                    <ChatPage />
-                                </ProtectedRoute>
-                            } />
-                            <Route path='/profile' element={
-                                <ProtectedRoute isUser={isUser}>
-                                    <Profile />
-                                </ProtectedRoute>
-                            } />
-                            <Route path='/emailConfirmed' element={
-                                <><div>Email has been confrimed</div>
-                                    <Link
-                                        href='/'
-                                        sx={{
-                                            fontSize: '1.5rem',
-                                            color: '#1976d2',
-                                        }}>Go back to home page</Link></>
-                            } />
-                            <Route path='*' element={
-                                <ErrorPage />
-                            } />
-                        </Routes>
+                        {children}
                     </Box>
                 </main>
             </Box>
