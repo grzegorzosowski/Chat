@@ -6,37 +6,9 @@ import { useUser } from '../UserProvider';
 import { addMessage } from '../features/messages/messagesSlice';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useGetUserNickMutation } from '../features/api/apiSlice';
+import blobToString from './lib/blobToString';
+import isServerMessage from './lib/isServerMessage';
 
-
-interface MessageData {
-  messageID: number;
-  senderID: string;
-  chatID: string;
-  message: string;
-  timestamp: number;
-}
-
-type ServerMessage = {
-  type: string;
-  content: MessageData;
-};
-
-function isServerMessage(obj: unknown): obj is ServerMessage {
-  if (obj == null || typeof obj !== 'object') {
-    return false;
-  }
-  const msg = obj as ServerMessage
-  return msg.content != null && typeof msg.type === 'string';
-}
-
-function blobToString(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsText(blob);
-  });
-}
 
 function useChatConnection() {
   const dispatch = useAppDispatch();
