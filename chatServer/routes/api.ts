@@ -23,5 +23,6 @@ router.post('/api/getMessages', ChatController.getMessages);
 router.post('/api/createChat', ChatController.createChat);
 router.post('/api/getUserAccountInfo', UserController.getUserAccountInfo);
 router.post('/api/resetPassword', UserController.resetPassword);
+router.post('/api/sendVerifyEmailAgain', UserController.sendVerifyEmailAgain);
 
 export = router;
