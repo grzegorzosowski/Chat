@@ -129,7 +129,7 @@ export const login = (req: Request, res: Response, next: any) => {
                     ip: req.socket.remoteAddress ?? '',
                 },
             });
-            return res.status(200).json({ data: user, status: 200 });
+            return res.status(200).json({ status: 200 });
         });
     })(req, res, next);
 };
