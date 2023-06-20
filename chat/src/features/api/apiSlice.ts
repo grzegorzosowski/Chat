@@ -1,23 +1,35 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 type Chat = {
-    id1: string;
-    id2: string;
-    nick1: string;
-    nick2: string;
+    id1: string | undefined;
+    id2: string | undefined;
+    nick1: string | undefined;
+    nick2: string | undefined;
+};
+
+type GroupChatID = {
+    groupChatID: string | undefined;
 };
 
 type GroupChat = {
-    groupChatID: string;
+    _id: string;
+    chatName: string;
+    members: string[];
+    membersNick: string[];
 };
 
 type ChatID = {
-    chatID: string;
+    chatID: string | undefined;
 };
 type User = {
     _id: string | undefined;
     nick: string | undefined;
 };
+type UserFromUserList = {
+    _id: string;
+    nick: string;
+};
+
 type CreateChat = {
     chatName: string;
     members: Array<User>;
@@ -48,6 +60,25 @@ type LoginCredential = {
     password: string;
 };
 
+type Result = {
+    _id: string;
+    members: string[];
+    chatName: string;
+};
+
+type UserList = {
+    users: UserFromUserList[];
+    groupChats: GroupChat[];
+};
+
+type Message = {
+    messageID: number;
+    senderID: string;
+    chatID: string;
+    message: string;
+    timestamp: number;
+};
+
 export type UserDto = {
     _id: string;
     nick: string;
@@ -57,6 +88,7 @@ export type UserDto = {
 
 export const apiSlice = createApi({
     reducerPath: 'api',
+    tagTypes: ['user'],
     baseQuery: fetchBaseQuery({ baseUrl: '/api/' }),
     endpoints: (builder) => ({
         getAuthUser: builder.query<UserDto, void>({
@@ -71,33 +103,53 @@ export const apiSlice = createApi({
                 body: body,
             }),
         }),
-        findChat: builder.mutation({
-            query: (chat: Chat) => ({
-                url: `findChat`,
+        sendVerifyEmailAgain: builder.mutation({
+            query: () => ({
+                url: 'sendVerifyEmailAgain',
                 method: 'POST',
-                body: chat,
             }),
         }),
-        findGroupChat: builder.mutation({
-            query: (chat: GroupChat) => ({
-                url: `findGroupChat`,
-                method: 'POST',
-                body: chat,
-            }),
+        findChat: builder.query<Result, Chat>({
+            query: (chat: Chat) => {
+                console.log('Find Chat working...');
+                return {
+                    url: `findChat`,
+                    method: 'POST',
+                    body: chat,
+                };
+            },
         }),
-        getMessages: builder.mutation({
-            query: (chatID: ChatID) => ({
-                url: `getMessages`,
-                method: 'POST',
-                body: chatID,
-            }),
+        findGroupChat: builder.query<GroupChat, GroupChatID>({
+            query: (chat: GroupChatID) => {
+                console.log('Find Group Chat working...');
+                return {
+                    url: `findGroupChat`,
+                    method: 'POST',
+                    body: chat,
+                };
+            },
         }),
-        getUserNick: builder.mutation({
-            query: (userID: UserID) => ({
-                url: `getUserNick`,
-                method: 'POST',
-                body: userID,
-            }),
+        getMessages: builder.query<Message[], ChatID>({
+            query: (chatID: ChatID) => {
+                console.log('Downloading messages for chatID: ', chatID.chatID);
+                return {
+                    url: `getMessages`,
+                    method: 'POST',
+                    body: chatID,
+                };
+            },
+        }),
+        getUserNick: builder.query<string, string>({
+            query: (userID) => {
+                const body: UserID = {
+                    userID,
+                };
+                return {
+                    url: `getUserNick`,
+                    method: 'POST',
+                    body,
+                };
+            },
         }),
         createChat: builder.mutation({
             query: (chatParam: CreateChat) => ({
@@ -120,14 +172,13 @@ export const apiSlice = createApi({
                 body: accountParam,
             }),
         }),
-        getUsers: builder.mutation({
-            query: (body: User) => ({
+        getUsers: builder.query<UserList, void>({
+            query: () => ({
                 url: 'getUsers',
                 method: 'POST',
-                body: body,
             }),
         }),
-        getUserAccountInfo: builder.mutation({
+        getUserAccountInfo: builder.query({
             query: (userID: UserID) => ({
                 url: 'getUserAccountInfo',
                 method: 'POST',
@@ -153,15 +204,16 @@ export const apiSlice = createApi({
 export const {
     useGetAuthUserQuery,
     useLoginUserMutation,
-    useFindChatMutation,
-    useGetMessagesMutation,
-    useGetUserNickMutation,
-    useGetUsersMutation,
+    useSendVerifyEmailAgainMutation,
+    useFindChatQuery,
+    useGetMessagesQuery,
+    useGetUserNickQuery,
+    useGetUsersQuery,
     useCreateChatMutation,
-    useFindGroupChatMutation,
+    useFindGroupChatQuery,
     useCreateAccountMutation,
     useChangeAccountNickMutation,
-    useGetUserAccountInfoMutation,
+    useGetUserAccountInfoQuery,
     useLogoutUserMutation,
     useResetPasswordMutation,
 } = apiSlice;
