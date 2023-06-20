@@ -101,15 +101,41 @@ class UserController {
         res.status(200).json(extractedData);
     };
     getUserNick = async (req: Request, res: Response) => {
+        const userFromSession = getUserFromSession(req.session);
+        if (!userFromSession) {
+            res.sendStatus(401);
+            return;
+        }
         const userID = req.body.userID;
         const foundedUser = await findUserById(userID);
         res.status(200).json(foundedUser?.nick);
     };
 
     getUsers = async (req: Request, res: Response) => {
-        const users = await User.find({ nick: { $ne: req.body.nick } }).select('_id, nick');
-        const groupChats = (await Chat.find({ members: req.body._id })).filter((chat: any) => chat.members.length > 2);
+        const userFromSession = getUserFromSession(req.session);
+        if (!userFromSession) {
+            res.sendStatus(401);
+            return;
+        }
+        const users = await User.find({ nick: { $ne: userFromSession.nick } }).select('_id, nick');
+        const groupChats = (await Chat.find({ members: userFromSession._id })).filter(
+            (chat: any) => chat.members.length > 2
+        );
         res.json({ users, groupChats });
+    };
+
+    sendVerifyEmailAgain = async (req: Request, res: Response) => {
+        console.log('Sending email again');
+        const userFromSession = getUserFromSession(req.session);
+        if (!userFromSession) {
+            res.sendStatus(401);
+            return;
+        }
+        const user = await findUserByEmail(userFromSession.email);
+        if (!user) {
+            return;
+        }
+        emailVerify(user);
     };
 
     emailToken = async (req: Request, res: Response) => {
