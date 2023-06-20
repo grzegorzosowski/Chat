@@ -1,5 +1,5 @@
 import { Box, Button } from '@mui/material'
-import React from 'react'
+import { useState } from 'react'
 import ProfileInfo from './ProfileInfo';
 import { useIsMobile } from '../../features/useIsMobile';
 import { ChangeNick } from './ChangeNick';
@@ -13,7 +13,7 @@ const MenuItems = [
 
 export default function Profile() {
     const isMobile = useIsMobile();
-    const [activeOption, setActiveOption] = React.useState<string>('Profile Info');
+    const [activeOption, setActiveOption] = useState<string>('Profile Info');
 
     const handleClick = (name: string) => {
         setActiveOption(name);
@@ -86,6 +86,7 @@ export default function Profile() {
     )
 
 }
+
 type CustomButtonType = {
     active: boolean,
     onClick: () => void,
