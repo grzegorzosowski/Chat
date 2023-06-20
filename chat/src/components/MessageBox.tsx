@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 import { addMessage } from '../features/messages/messagesSlice';
 import { useUser } from '../UserProvider';
 import { Box } from '@mui/material';
+import { useGetMessagesQuery } from '../features/api/apiSlice';
 
 
 
@@ -12,7 +13,8 @@ export default function MessageBox(): JSX.Element {
     const [messageText, setMessageText] = useState<string>('');
     const dispatch = useAppDispatch();
     const messages = useAppSelector((state) => state.messages.messages)
-    const activeChat = useAppSelector((state) => state.activeChat.activeChat)
+    const activeChat = useAppSelector((state) => state.activeChat.activeChat);
+    const { refetch } = useGetMessagesQuery({ chatID: activeChat.chatID })
     useEffect(() => {
         if (user) {
             const ws = webSocket;
@@ -43,6 +45,7 @@ export default function MessageBox(): JSX.Element {
                 dispatch(addMessage(newMessage))
                 sendMessage(JSON.stringify(newMessage));
                 setMessageText('')
+                void refetch();
             }
         }
     }

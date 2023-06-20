@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react'
 import { useUser } from '../UserProvider';
 import User from './User'
 import Link from '@mui/material/Link';
-import { useAppDispatch } from '../hooks';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { setActiveChat, setGettingChat } from '../features/chats/chatsSlice';
-import { useFindChatMutation, useGetMessagesMutation, useFindGroupChatMutation, useGetUsersMutation } from '../features/api/apiSlice';
+import { useFindChatQuery, useGetMessagesQuery, useFindGroupChatQuery, useGetUsersQuery } from '../features/api/apiSlice';
 import { putMessages } from '../features/messages/messagesSlice';
 import GroupChat from './GroupChat';
 import { Tooltip, Typography } from '@mui/material';
@@ -17,6 +17,7 @@ type User = {
   _id: string;
   nick: string;
 }
+
 type GroupChat = {
   _id: string;
   chatName: string;
@@ -51,38 +52,90 @@ export default function UserList(): JSX.Element {
   const user = useUser();
   const isMobile = useIsMobile();
   const dispatch = useAppDispatch();
+  const activeChat = useAppSelector((state) => state.activeChat)
   const [users, setUsers] = useState<User[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
   const [serverData, setServerData] = useState<Array<string> | null>(null);
-  const [findChat] = useFindChatMutation();
-  const [getMessages] = useGetMessagesMutation();
-  const [findGroupChat] = useFindGroupChatMutation();
-  const [getUsersList] = useGetUsersMutation();
+  const [userLink, setUserLink] = useState<User | null>(null)
+  const [groupChatId, setGroupChatId] = useState<string | undefined>(undefined)
+  const { data: chatData, error: chatError, isLoading: chatIsLoading } = useFindChatQuery({ id1: user?._id, id2: userLink?._id, nick1: user?.nick, nick2: userLink?.nick }, {
+    skip: user == null || userLink == null,
+  });
+
+  const { data: getMessagesData, error: getMessagesError, isLoading: getMessagesIsLoading } = useGetMessagesQuery({ chatID: chatData?._id }, {
+    skip: chatData == null
+  });
+
+  const { data: groupChatData, error: groupChatError, isLoading: groupChatIsLoading } = useFindGroupChatQuery({ groupChatID: groupChatId }, {
+    skip: user == null || groupChatId == undefined,
+  })
+  const { data: getGroupMessagesData, isLoading: getGroupMessagesIsLoading } = useGetMessagesQuery({ chatID: groupChatId }, {
+    skip: groupChatData == undefined
+  });
+  const { data: userListData, error: userListError, isLoading: userListIsLoading } = useGetUsersQuery();
   const ws = webSocket;
 
   useEffect(() => {
-    const getUsers = async () => {
-      await getUsersList({ _id: user?._id, nick: user?.nick })
-        .unwrap()
-        .then((res: ResponseData) => {
-          setGroupChats(res.groupChats);
-          setUsers(res.users)
-        })
-        .catch((err) => {
-          console.error(err)
-        })
+    const getUsers = () => {
+      if (userListData) {
+        setGroupChats(userListData.groupChats);
+        setUsers(userListData.users)
+      }
     }
 
     ws.addEventListener('open', function () {
       ws.send(JSON.stringify('getUsers'))
     });
 
-    if (!usersFetched) {
-      void getUsers();
-      setUsersFetched(true);
+    if (userListData) {
+      if (!usersFetched) {
+        getUsers();
+        setUsersFetched(true);
+      }
     }
-  }, []);
+  }, [userListData]);
+
+  useEffect(() => {
+    const handleChatDataChange = () => {
+      if (groupChatData) {
+        const newChat = {
+          chatID: groupChatData._id,
+          members: groupChatData.members,
+          chatName: groupChatData.chatName,
+        };
+        dispatch(setActiveChat(newChat));
+        if (getGroupMessagesData) {
+          dispatch(putMessages(getGroupMessagesData));
+          dispatch(setGettingChat(false));
+        }
+      }
+    };
+
+    if (!groupChatIsLoading && !groupChatError && groupChatData) {
+      handleChatDataChange();
+    }
+  }, [groupChatData, groupChatIsLoading, groupChatError, getGroupMessagesData, getGroupMessagesIsLoading]);
+
+  useEffect(() => {
+    const handleChatDataChange = () => {
+      if (chatData) {
+        const newChat = {
+          chatID: chatData._id,
+          members: chatData.members,
+          chatName: chatData.chatName,
+        };
+        dispatch(setActiveChat(newChat));
+        if (getMessagesData) {
+          dispatch(putMessages(getMessagesData));
+          dispatch(setGettingChat(false));
+        }
+      }
+    };
+    if (!chatIsLoading && !chatError && chatData) {
+      handleChatDataChange();
+    }
+  }, [chatData, chatError, chatIsLoading, getMessagesData, userLink, getMessagesIsLoading]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<Blob>) => {
@@ -97,57 +150,22 @@ export default function UserList(): JSX.Element {
       reader.readAsText(event.data)
     }
     ws.addEventListener('message', onMessage);
+
     return () => {
       ws.removeEventListener('message', onMessage)
     };
   }, [serverData])
 
-  const handleClick = (userLink: User | GroupChat) => {
-    if (user == null) {
-      return;
-    }
+
+  const userHandleClick = (userLink: User) => {
+    setUserLink(userLink)
     dispatch(setGettingChat(true));
-    if ('nick' in userLink) {  // ### if userLink has nick property, it's a user, not group ### //
-      findChat({ id1: user._id, id2: userLink._id, nick1: user.nick, nick2: userLink?.nick })
-        .unwrap()
-        .then((result: Result) => {
-          const newChat = {
-            chatID: result?._id,
-            members: result?.members,
-            chatName: result?.chatName,
-          };
-          dispatch(setActiveChat(newChat));
-          getMessages({ chatID: newChat.chatID })
-            .unwrap()
-            .then((result: Message[]) => {
-              dispatch(putMessages(result));
-              dispatch(setGettingChat(false));
-            })
-            .catch((error) => console.log(error));
-        })
-        .catch((error) => console.log(error));
-    } else {
-      findGroupChat({ groupChatID: userLink._id })
-        .unwrap()
-        .then((result: Result) => {
-          const newChat = {
-            chatID: result?._id,
-            members: result?.members,
-            chatName: result?.chatName,
-          };
-          dispatch(setActiveChat(newChat));
-          getMessages({ chatID: newChat.chatID })
-            .unwrap()
-            .then((result: Message[]) => {
-              dispatch(putMessages(result));
-              dispatch(setGettingChat(false));
-            })
-            .catch((error) => console.log(error));
-        })
-        .catch((error) => console.log(error));
-    }
   }
 
+  const groupChatHandleClick = (groupChat: GroupChat) => {
+    setGroupChatId(groupChat._id)
+    dispatch(setGettingChat(true))
+  }
 
   return (
     <Box sx={(theme) => ({
@@ -160,12 +178,12 @@ export default function UserList(): JSX.Element {
       borderRadius: isMobile ? '10px' : '0 10px 10px 0',
     })}>
       <Typography variant='body1'>USERS</Typography>
-      {users && users.map((user: User) => <Link key={user._id} onClick={() => handleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
+      {users && users.map((user: User) => <Link key={user._id} onClick={() => userHandleClick(user)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
         <User key={user.nick} user={user} isLogged={serverData?.includes(user._id)}></User>
       </Link>)}
       {groupChats.length > 0 && <Typography variant='body1' gutterBottom>GROUPS</Typography>}
       {groupChats && groupChats.map((groupChat: GroupChat) => <Tooltip key={groupChat._id} title={'Hint'}>
-        <Link key={groupChat._id} onClick={() => handleClick(groupChat)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
+        <Link key={groupChat._id} onClick={() => groupChatHandleClick(groupChat)} underline='none' sx={{ '&:hover': { cursor: 'pointer' } }}>
           <GroupChat groupChat={groupChat} ></GroupChat></Link>
       </Tooltip>)}
     </Box>
