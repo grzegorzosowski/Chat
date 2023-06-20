@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useUser } from '../../UserProvider';
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { useGetUserAccountInfoMutation } from '../../features/api/apiSlice';
+import { Box, Link, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
+import { UserDto, useGetUserAccountInfoQuery, useSendVerifyEmailAgainMutation } from '../../features/api/apiSlice';
 import LoadingCircle from '../LoadingCircle';
 import { useIsMobile } from '../../features/useIsMobile';
+import { isValidEmailAddress } from '../lib/isValidEmailAddress';
 
 type LoginInfo = {
     lastLogin: {
@@ -25,27 +26,28 @@ type TableData = {
 
 export default function ProfileInfo() {
     const user = useUser();
+    const isUser = !!user;
     const isMobile = useIsMobile();
     const [loginInfo, setLoginInfo] = useState<LoginInfo>()
-    const [getUserAccInfo] = useGetUserAccountInfoMutation()
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!user) {
-                console.log('asd')
-            } else {
-                await getUserAccInfo({ userID: user._id })
-                    .unwrap()
-                    .then((res: LoginInfo) => {
-                        console.log("Odpowiedź: ", res)
-                        setLoginInfo(res);
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                    })
-            }
-        }
-        void fetchData();
-    }, [])
+    //const [getUserAccInfo] = useGetUserAccountInfoQuery()
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         if (!user) {
+    //             console.log('asd')
+    //         } else {
+    //             await getUserAccInfo({ userID: user._id })
+    //                 .unwrap()
+    //                 .then((res: LoginInfo) => {
+    //                     console.log("Odpowiedź: ", res)
+    //                     setLoginInfo(res);
+    //                 })
+    //                 .catch((err) => {
+    //                     console.log(err)
+    //                 })
+    //         }
+    //     }
+    //     void fetchData();
+    // }, [])
 
     const createData = (describe: string, data: string | undefined) => {
         return {
@@ -67,9 +69,13 @@ export default function ProfileInfo() {
     return (
         <Box>
             {loginInfo !== undefined
-                ? <InfoTable rows={rows} isVerified={user?.verified} isMobile={isMobile} />
+                ? <Box>
+                    <InfoTable rows={rows} isVerified={user?.verified} isMobile={isMobile} />
+                    {(!user?.verified && isUser) && <VerifyAgainButton userId={user._id} />}
+                </Box>
                 : <LoadingCircle />
             }
+
         </Box>
     )
 }
@@ -96,12 +102,36 @@ const InfoTable = ({ rows, isVerified, isMobile }: { rows: Array<TableData>, isV
                         <TableRow key={index}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                             <TableCell sx={{ width: isMobile ? '100px' : '200px' }}>{item.describe}</TableCell>
-                            <TableCell ><Box sx={{ display: 'flex' }}>{item.data}{item.data?.includes('@') && (isVerified ? <Verified /> : <NotVerified />)}</Box></TableCell>
+                            <TableCell ><Box sx={{ display: 'flex' }}>{item.data}{isValidEmailAddress(item?.data) && (isVerified ? <Verified /> : <NotVerified />)}</Box></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
         </TableContainer>
+    )
+}
+
+const VerifyAgainButton = ({ userId }: { userId: string }) => {
+    const [sendVerifyEmailAgain] = useSendVerifyEmailAgainMutation()
+    const handleClick = () => {
+        void sendVerifyEmailAgain({ userID: userId })
+
+    }
+
+
+    return (
+        <Box sx={{
+            p: '20px',
+        }}>
+            <Link
+                onClick={handleClick}
+                sx={{
+                    cursor: 'pointer',
+                }}
+            >
+                Send verify email again
+            </Link>
+        </Box>
     )
 }
 
