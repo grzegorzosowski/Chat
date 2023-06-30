@@ -71,10 +71,12 @@ export default function UserList(): JSX.Element {
     skip: user == null || groupChatId == undefined,
   })
   const { data: getGroupMessagesData, isLoading: getGroupMessagesIsLoading } = useGetMessagesQuery({ chatID: groupChatId }, {
-    skip: groupChatData == undefined
+    skip: groupChatData == undefined || groupChatId == null
   });
   const { data: userListData, error: userListError, isLoading: userListIsLoading } = useGetUsersQuery();
   const ws = webSocket;
+
+  console.log("groupChatId: ", groupChatId, "groupChatData: ", groupChatData)
 
   useEffect(() => {
     const getUsers = () => {
@@ -97,7 +99,7 @@ export default function UserList(): JSX.Element {
   }, [userListData]);
 
   useEffect(() => {
-    const handleChatDataChange = () => {
+    if (groupChatId != null && !groupChatIsLoading && !groupChatError && groupChatData) {
       if (groupChatData) {
         const newChat = {
           chatID: groupChatData._id,
@@ -110,32 +112,23 @@ export default function UserList(): JSX.Element {
           dispatch(setGettingChat(false));
         }
       }
-    };
-
-    if (!groupChatIsLoading && !groupChatError && groupChatData) {
-      handleChatDataChange();
     }
-  }, [groupChatData, groupChatIsLoading, groupChatError, getGroupMessagesData, getGroupMessagesIsLoading]);
+  }, [groupChatId, groupChatData, groupChatIsLoading, groupChatError, getGroupMessagesData]);
 
   useEffect(() => {
-    const handleChatDataChange = () => {
-      if (chatData) {
-        const newChat = {
-          chatID: chatData._id,
-          members: chatData.members,
-          chatName: chatData.chatName,
-        };
-        dispatch(setActiveChat(newChat));
-        if (getMessagesData) {
-          dispatch(putMessages(getMessagesData));
-          dispatch(setGettingChat(false));
-        }
+    if (userLink != null && !chatIsLoading && !chatError && chatData) {
+      const newChat = {
+        chatID: chatData._id,
+        members: chatData.members,
+        chatName: chatData.chatName,
+      };
+      dispatch(setActiveChat(newChat));
+      if (getMessagesData) {
+        dispatch(putMessages(getMessagesData));
+        dispatch(setGettingChat(false));
       }
-    };
-    if (!chatIsLoading && !chatError && chatData) {
-      handleChatDataChange();
     }
-  }, [chatData, chatError, chatIsLoading, getMessagesData, userLink, getMessagesIsLoading]);
+  }, [chatData, chatError, chatIsLoading, getMessagesData, userLink]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<Blob>) => {
@@ -158,11 +151,13 @@ export default function UserList(): JSX.Element {
 
 
   const userHandleClick = (userLink: User) => {
+    setGroupChatId(undefined);
     setUserLink(userLink)
     dispatch(setGettingChat(true));
   }
 
   const groupChatHandleClick = (groupChat: GroupChat) => {
+    setUserLink(null);
     setGroupChatId(groupChat._id)
     dispatch(setGettingChat(true))
   }
