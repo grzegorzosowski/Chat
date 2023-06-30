@@ -14,12 +14,7 @@ export default function User({ user, isLogged }: UserProps,): JSX.Element {
     const activeChat = useAppSelector((state) => state.activeChat)
     const id = user._id;
     const nick = user.nick;
-    let active: boolean
-    if (activeChat.activeChat.members.length === 2) {
-        active = activeChat.activeChat.members.includes(id);
-    } else {
-        active = false;
-    }
+    const active = activeChat.activeChat.members.length === 2 && activeChat.activeChat.members.includes(id);
 
     return (
         <>
