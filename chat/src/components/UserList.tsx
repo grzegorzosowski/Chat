@@ -1,13 +1,13 @@
 import Box from '@mui/material/Box';
-import { useEffect, useState } from 'react'
-import { useUser } from '../UserProvider';
+import GroupChat from './GroupChat';
 import User from './User'
 import Link from '@mui/material/Link';
-import { useAppDispatch, useAppSelector } from '../hooks';
+import { useEffect, useState } from 'react'
+import { useUser } from '../UserProvider';
+import { useAppDispatch } from '../hooks';
 import { setActiveChat, setGettingChat } from '../features/chats/chatsSlice';
 import { useFindChatQuery, useGetMessagesQuery, useFindGroupChatQuery, useGetUsersQuery } from '../features/api/apiSlice';
 import { putMessages } from '../features/messages/messagesSlice';
-import GroupChat from './GroupChat';
 import { Tooltip, Typography } from '@mui/material';
 import { FOOTER_HEIGHT } from './Footer';
 import { useIsMobile } from '../features/useIsMobile';
@@ -25,24 +25,6 @@ type GroupChat = {
   membersNick: string[];
 }
 
-type ResponseData = {
-  users: User[];
-  groupChats: GroupChat[];
-}
-type Result = {
-  _id: string;
-  members: string[];
-  chatName: string;
-}
-
-type Message = {
-  messageID: number;
-  senderID: string;
-  chatID: string;
-  message: string;
-  timestamp: number;
-}
-
 type ServerMessage = {
   type: string;
   content: Array<string>;
@@ -50,33 +32,29 @@ type ServerMessage = {
 
 export default function UserList(): JSX.Element {
   const user = useUser();
+  const ws = webSocket;
   const isMobile = useIsMobile();
   const dispatch = useAppDispatch();
-  const activeChat = useAppSelector((state) => state.activeChat)
   const [users, setUsers] = useState<User[]>([]);
   const [groupChats, setGroupChats] = useState<GroupChat[]>([]);
   const [usersFetched, setUsersFetched] = useState<boolean>(false);
   const [serverData, setServerData] = useState<Array<string> | null>(null);
   const [userLink, setUserLink] = useState<User | null>(null)
   const [groupChatId, setGroupChatId] = useState<string | undefined>(undefined)
-  const { data: chatData, error: chatError, isLoading: chatIsLoading } = useFindChatQuery({ id1: user?._id, id2: userLink?._id, nick1: user?.nick, nick2: userLink?.nick }, {
+
+  const { data: chatData, error: chatError, isFetching: chatIsLoading } = useFindChatQuery({ id1: user?._id, id2: userLink?._id, nick1: user?.nick, nick2: userLink?.nick }, {
     skip: user == null || userLink == null,
   });
-
-  const { data: getMessagesData, error: getMessagesError, isLoading: getMessagesIsLoading } = useGetMessagesQuery({ chatID: chatData?._id }, {
-    skip: chatData == null
+  const { data: messagesData, isFetching: messagesDataIsLoading } = useGetMessagesQuery({ chatID: chatData?._id }, {
+    skip: chatData == null,
   });
-
   const { data: groupChatData, error: groupChatError, isLoading: groupChatIsLoading } = useFindGroupChatQuery({ groupChatID: groupChatId }, {
     skip: user == null || groupChatId == undefined,
   })
-  const { data: getGroupMessagesData, isLoading: getGroupMessagesIsLoading } = useGetMessagesQuery({ chatID: groupChatId }, {
+  const { data: groupMessagesData, isFetching: groupMessagesDataIsLoading } = useGetMessagesQuery({ chatID: groupChatId }, {
     skip: groupChatData == undefined || groupChatId == null
   });
-  const { data: userListData, error: userListError, isLoading: userListIsLoading } = useGetUsersQuery();
-  const ws = webSocket;
-
-  console.log("groupChatId: ", groupChatId, "groupChatData: ", groupChatData)
+  const { data: userListData, } = useGetUsersQuery();
 
   useEffect(() => {
     const getUsers = () => {
@@ -99,7 +77,7 @@ export default function UserList(): JSX.Element {
   }, [userListData]);
 
   useEffect(() => {
-    if (groupChatId != null && !groupChatIsLoading && !groupChatError && groupChatData) {
+    if (groupChatId != null && groupChatData && !groupChatIsLoading && !groupChatError && !groupMessagesDataIsLoading) {
       if (groupChatData) {
         const newChat = {
           chatID: groupChatData._id,
@@ -107,28 +85,28 @@ export default function UserList(): JSX.Element {
           chatName: groupChatData.chatName,
         };
         dispatch(setActiveChat(newChat));
-        if (getGroupMessagesData) {
-          dispatch(putMessages(getGroupMessagesData));
+        if (groupMessagesData) {
+          dispatch(putMessages(groupMessagesData));
           dispatch(setGettingChat(false));
         }
       }
     }
-  }, [groupChatId, groupChatData, groupChatIsLoading, groupChatError, getGroupMessagesData]);
+  }, [groupChatId, groupChatData, groupChatIsLoading, groupChatError, groupMessagesData, groupMessagesDataIsLoading]);
 
   useEffect(() => {
-    if (userLink != null && !chatIsLoading && !chatError && chatData) {
+    if (userLink != null && chatData && !chatIsLoading && !messagesDataIsLoading && !chatError) {
       const newChat = {
         chatID: chatData._id,
         members: chatData.members,
         chatName: chatData.chatName,
       };
       dispatch(setActiveChat(newChat));
-      if (getMessagesData) {
-        dispatch(putMessages(getMessagesData));
+      if (messagesData) {
+        dispatch(putMessages(messagesData));
         dispatch(setGettingChat(false));
       }
     }
-  }, [chatData, chatError, chatIsLoading, getMessagesData, userLink]);
+  }, [chatData, chatError, chatIsLoading, messagesData, userLink, messagesDataIsLoading]);
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<Blob>) => {
