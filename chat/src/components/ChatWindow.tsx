@@ -4,10 +4,10 @@ import { webSocket } from '../webSocketConfig'
 import { useAppSelector, useAppDispatch } from '../hooks';
 import { useUser } from '../UserProvider';
 import { addMessage } from '../features/messages/messagesSlice';
-import CircularProgress from '@mui/material/CircularProgress';
 import { useGetUserNickQuery } from '../features/api/apiSlice';
 import blobToString from './lib/blobToString';
 import isServerMessage from './lib/isServerMessage';
+import LoadingCircle from './LoadingCircle';
 
 
 export default function ChatWindow(): JSX.Element {
@@ -18,7 +18,7 @@ export default function ChatWindow(): JSX.Element {
   const activeChat = useAppSelector((state) => state.activeChat.activeChat);
   const gettingChat = useAppSelector((state) => state.activeChat.gettingChat);
   const [senderId, setSenderId] = useState<string | undefined>()
-  const { data: userNick } = useGetUserNickQuery(senderId as string, {
+  const { data: userNick, isFetching: userNickIsFetching } = useGetUserNickQuery(senderId as string, {
     skip: senderId == null
   });
 
@@ -31,10 +31,6 @@ export default function ChatWindow(): JSX.Element {
     }
   }, [message])
 
-
-  if (gettingChat) {
-    return <Loader />
-  }
 
   return (
     <>
@@ -67,10 +63,10 @@ export default function ChatWindow(): JSX.Element {
           borderRadius: '4px',
         }
       }}>
-        {activeChat.chatID !== '1' && message.map(mess =>
+        {gettingChat ? <LoadingCircle /> : activeChat.chatID !== '1' && message.map(mess =>
           <Tooltip
             key={mess.timestamp}
-            title={userNick !== '' &&
+            title={userNick !== '' && !userNickIsFetching &&
               <>
                 <Typography variant="caption" sx={{ display: 'block' }}>{userNick}</Typography>
                 <Typography variant="caption" >{new Date(mess.timestamp).toLocaleString()}</Typography>
@@ -138,21 +134,3 @@ function useChatConnection() {
     };
   }, [dispatch, message]);
 }
-
-const Loader = () => {
-  return (
-    <Box sx={{
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      justifyContent: 'center ',
-      alignItems: 'center',
-      backgroundColor: 'aliceblue',
-      opacity: '0.8',
-      borderRadius: '10px',
-    }}>
-      <CircularProgress size={50} />
-    </Box>
-  )
-}
-
